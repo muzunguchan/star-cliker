@@ -1,93 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⭐ Star Clicker</title>
-</* ====================== SCORE POPUP STYLE ====================== */
-.popup {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-.popup-content {
-    background: var(--bg2, #0f172a);
-    padding: 35px 30px;
-    border-radius: 16px;
-    text-align: center;
-    border: 3px solid var(--gold, #ffd700);
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
-    max-width: 380px;
-    width: 90%;
-    color: var(--text, #e0f2fe);
-}
-
-.popup-content h2 {
-    color: var(--gold, #ffd700);
-    margin: 0 0 15px 0;
-    font-size: 28px;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-#finalScoreText {
-    font-size: 20px;
-    margin: 15px 0 20px 0;
-}
-
-#playerNameInput {
-    width: 100%;
-    padding: 14px;
-    font-size: 18px;
-    background: var(--bg, #1e2937);
-    border: 2px solid #334155;
-    border-radius: 8px;
-    color: white;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#playerNameInput:focus {
-    outline: none;
-    border-color: var(--gold, #ffd700);
-    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
-}
-
-.popup-buttons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-}
-
-.popup-buttons button {
-    padding: 12px 28px;
-    font-size: 17px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.popup-buttons button:first-child {
-    background: #334155;
-    color: #cbd5e1;
-    border: 2px solid #475569;
-}
-
-.submit-btn {
-    background: var(--gold, #ffd700);
-    color: #0f172a;
-    font-weight: bold;
-    border: none;
-}
-
-.popup-buttons button:hover {
-    transform: scale(1.05);
-}>
+<style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --bg:#07071a;--bg2:#0d0d26;--bg3:#13132e;--bg4:#1a1a3a;
@@ -100,7 +18,6 @@
 body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:16px;}
 #app{width:100%;max-width:700px;}
 
-/* SCREENS */
 .screen{display:none;}
 .screen.active{display:block;}
 
@@ -108,8 +25,6 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 #auth-screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
 #auth-screen.active{display:flex;}
 .auth-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:360px;}
-.auth-title{font-size:28px;font-weight:500;text-align:center;margin-bottom:6px;}
-.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:1.5rem;}
 .auth-tabs{display:flex;gap:8px;margin-bottom:1.2rem;}
 .auth-tab{flex:1;padding:8px;font-size:13px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;transition:all 0.15s;}
 .auth-tab.active{background:var(--accent2);color:var(--text);border-color:var(--accent);}
@@ -126,8 +41,6 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 #setup-screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
 #setup-screen.active{display:flex;}
 .setup-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:420px;text-align:center;}
-.setup-title{font-size:22px;font-weight:500;margin-bottom:6px;}
-.setup-sub{font-size:13px;color:var(--text3);margin-bottom:1.5rem;}
 .gender-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
 .gender-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:1.5rem 1rem;cursor:pointer;transition:all 0.15s;}
 .gender-card:hover{border-color:var(--accent);}
@@ -135,7 +48,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 .gender-icon{font-size:48px;margin-bottom:8px;}
 .gender-label{font-size:14px;font-weight:500;}
 
-/* MAIN APP */
+/* MAIN */
 #main-screen{display:none;}
 #main-screen.active{display:block;}
 .tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
@@ -207,12 +120,6 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 .title-pill.equipped{border-color:rgba(255,255,255,0.3)!important;}
 #owned-titles-grid{display:flex;flex-wrap:wrap;gap:6px;margin:0 1rem 0.5rem;}
 
-/* TITLES TAB */
-#all-titles-wrap{padding:0 1rem;}
-.rar-section{margin-bottom:1rem;}
-.rar-header{font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:6px 10px;border-radius:8px;}
-.titles-flex{display:flex;flex-wrap:wrap;gap:5px;}
-
 /* COSMETICS TAB */
 #cosmetics-wrap{padding:0 1rem;}
 .cosm-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0.75rem;}
@@ -230,20 +137,12 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 .cosm-price{font-size:10px;font-weight:500;margin-top:3px;}
 .cosm-rarity-tag{font-size:9px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;margin-top:2px;display:block;}
 .cosm-owned-tag{font-size:9px;color:#5DCAA5;margin-top:2px;display:block;}
-/* rarity borders */
 .cosm-r-common{border-color:#444466;}
 .cosm-r-uncommon{border-color:#0F6E5666;}
 .cosm-r-rare{border-color:#185FA566;}
 .cosm-r-epic{border-color:#3C348966;}
 .cosm-r-legendary{border-color:#BA751766;}
 .cosm-r-mythic{border-color:#6B1B6B66;}
-/* shine sweep animations */
-@keyframes shineCommon{0%{left:-100%;}100%{left:200%;}}
-@keyframes shineUncommon{0%{left:-100%;}100%{left:200%;}}
-@keyframes shineRare{0%{left:-100%;}100%{left:200%;}}
-@keyframes shineEpic{0%{left:-100%;}100%{left:200%;}}
-@keyframes shineLegendary{0%{left:-100%;}100%{left:200%;}}
-@keyframes shineMythic{0%{left:-100%;}100%{left:200%;}}
 .cosm-item::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);pointer-events:none;}
 .cosm-r-uncommon::before{background:linear-gradient(90deg,transparent,rgba(93,202,165,0.13),transparent);}
 .cosm-r-rare::before{background:linear-gradient(90deg,transparent,rgba(55,138,221,0.18),transparent);}
@@ -251,14 +150,13 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 .cosm-r-legendary::before{background:linear-gradient(90deg,transparent,rgba(255,215,0,0.28),transparent);}
 .cosm-r-mythic::before{background:linear-gradient(90deg,transparent,rgba(255,111,255,0.32),transparent);}
 .cosm-item:hover::before{animation:shineCommon 0.6s ease forwards;}
-/* legendary sparkle pulse */
+@keyframes shineCommon{0%{left:-100%;}100%{left:200%;}}
 .cosm-r-legendary{box-shadow:0 0 6px #ffd70022;}
 .cosm-r-legendary:hover{box-shadow:0 0 14px #ffd70055!important;}
 .cosm-r-mythic{box-shadow:0 0 8px #ff6fff22;}
 .cosm-r-mythic:hover{box-shadow:0 0 18px #ff6fff66!important;}
 @keyframes mythicPulse{0%,100%{box-shadow:0 0 8px #ff6fff22;}50%{box-shadow:0 0 16px #ff6fff55;}}
 .cosm-r-mythic{animation:mythicPulse 2.5s ease-in-out infinite;}
-/* shop balance bar */
 #shop-balance{font-size:13px;color:var(--gold);font-weight:500;margin-bottom:0.75rem;padding:8px 12px;background:var(--bg3);border-radius:8px;border:0.5px solid var(--border);display:flex;align-items:center;gap:6px;}
 .buy-btn{display:block;width:100%;margin-top:4px;padding:4px;font-size:10px;font-weight:500;border-radius:6px;border:0.5px solid;cursor:pointer;font-family:inherit;transition:opacity 0.1s;}
 .buy-btn:hover{opacity:0.8;}
@@ -288,10 +186,8 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 .lb-rank{width:22px;text-align:center;flex-shrink:0;color:var(--text4);font-size:13px;}
 .lb-name{flex:1;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .lb-score{font-weight:500;color:var(--gold);}
+.lb-loading{padding:20px;text-align:center;font-size:12px;color:var(--text4);}
 .title-badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:99px;font-weight:500;margin-right:4px;vertical-align:middle;}
-
-/* AVATAR SVG */
-.avatar-svg{overflow:visible;}
 
 /* MISC */
 .sp-btn{padding:7px 13px;font-size:12px;cursor:pointer;border-radius:8px;border:0.5px solid var(--accent2);background:var(--bg4);color:var(--text2);font-family:inherit;transition:background 0.1s;}
@@ -340,8 +236,8 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 <div id="setup-screen" class="screen">
   <div style="font-size:36px;margin-bottom:8px">👾</div>
   <div class="setup-box">
-    <div class="setup-title">welcome, <span id="setup-name">commander</span>!</div>
-    <div class="setup-sub">first, create your character</div>
+    <div style="font-size:22px;font-weight:500;margin-bottom:6px;">welcome, <span id="setup-name">commander</span>!</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:1.5rem;">first, create your character</div>
     <div style="font-size:12px;color:var(--text4);margin-bottom:0.75rem;">choose gender</div>
     <div class="gender-grid">
       <div class="gender-card selected" id="gender-m" onclick="selectGender('m')">
@@ -402,7 +298,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
     <div id="reel-result"><div style="font-size:12px;color:var(--text4);">open a crate to reveal your title</div></div>
     <div class="section-label">your titles</div>
     <div id="owned-titles-grid"></div>
-    <div style="text-align:center;margin-top:8px;"><button class="sp-btn" onclick="switchTab('titles-all')">browse all titles →</button></div>
+    <div style="text-align:center;margin-top:8px;"><button class="sp-btn" onclick="switchTab('lb')">check leaderboard →</button></div>
   </div>
 
   <!-- COSMETICS -->
@@ -442,14 +338,74 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
   <div class="tab-panel" id="panel-lb">
     <div class="section-label" style="margin-top:0.5rem;">global leaderboard</div>
     <div id="lb-wrap-inner">
-      <div class="lb-card"><div class="lb-hdr"><span>commander</span><span>stars</span></div><div id="lb-body"></div></div>
+      <div class="lb-card">
+        <div class="lb-hdr"><span>commander</span><span>stars</span></div>
+        <div id="lb-body"><div class="lb-loading">loading…</div></div>
+      </div>
     </div>
   </div>
+</div>
+</div>
 
-</div>
-</div>
-</style>
 <script>
+// ============================================================
+// SUPABASE
+// ============================================================
+var SUPABASE_URL = 'https://garpyougiwrqmoohobgw.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_6x-IrDfkLQSKmGBBp65a2A_5WSEMI-L';
+var _supabase = null;
+
+function getSupabase() {
+  if (!_supabase) {
+    try {
+      _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+      console.warn('Supabase init failed:', e);
+    }
+  }
+  return _supabase;
+}
+
+async function submitScore(playerName, score) {
+  var sb = getSupabase();
+  if (!sb || !playerName || score < 50) return false;
+  try {
+    var res = await sb.from('leaderboard').upsert([{
+      name: playerName.trim().substring(0, 20),
+      score: Math.floor(score),
+      title: state.equippedTitle || null,
+    }], { onConflict: 'name' });
+    if (res.error) {
+      // fallback: try insert if upsert fails (table may not have unique constraint)
+      await sb.from('leaderboard').insert([{
+        name: playerName.trim().substring(0, 20),
+        score: Math.floor(score),
+        title: state.equippedTitle || null,
+      }]);
+    }
+    return true;
+  } catch(e) {
+    console.warn('submitScore error:', e);
+    return false;
+  }
+}
+
+async function getLeaderboard() {
+  var sb = getSupabase();
+  if (!sb) return [];
+  try {
+    var res = await sb.from('leaderboard')
+      .select('name, score, title')
+      .order('score', { ascending: false })
+      .limit(15);
+    if (res.error) { console.warn('LB fetch error:', res.error); return []; }
+    return res.data || [];
+  } catch(e) {
+    console.warn('getLeaderboard error:', e);
+    return [];
+  }
+}
+
 // ============================================================
 // DATA
 // ============================================================
@@ -460,20 +416,18 @@ var SKIN_COLORS=[
   {id:'s7',hex:'#5C2409',name:'deep'},{id:'s8',hex:'#FAEBD7',name:'pale'},
   {id:'s9',hex:'#C68642',name:'golden'},{id:'s10',hex:'#A0522D',name:'sienna'},
 ];
-
 var HAIR_COLORS=['#1a0800','#3b1f0a','#6b3a2a','#8B4513','#A0522D','#C19A6B','#D4AF70','#F5D5A0','#FFD700','#FF6B6B','#FF1493','#9B59B6','#3498DB','#2ECC71','#fff','#888','#444','#c0392b','#e67e22','#1abc9c'];
 
 var RARITIES=[
-  {name:'common',    color:'#888780',bg:'#1a1a1a',chance:1/2,     display:'1 in 2',     resultClass:'result-anim-common'},
-  {name:'uncommon',  color:'#5DCAA5',bg:'#04201a',chance:1/5,     display:'1 in 5',     resultClass:'result-anim-uncommon'},
-  {name:'rare',      color:'#378ADD',bg:'#041428',chance:1/20,    display:'1 in 20',    resultClass:'result-anim-rare'},
-  {name:'epic',      color:'#AFA9EC',bg:'#12103a',chance:1/100,   display:'1 in 100',   resultClass:'result-anim-epic'},
-  {name:'legendary', color:'#ffd700',bg:'#1a1200',chance:1/500,   display:'1 in 500',   resultClass:'result-anim-legendary'},
-  {name:'mythic',    color:'#ff6fff',bg:'#1a0020',chance:1/5000,  display:'1 in 5,000', resultClass:'result-anim-mythic'},
+  {name:'common',    color:'#888780',bg:'#1a1a1a',chance:1/2,     display:'1 in 2',        resultClass:'result-anim-common'},
+  {name:'uncommon',  color:'#5DCAA5',bg:'#04201a',chance:1/5,     display:'1 in 5',        resultClass:'result-anim-uncommon'},
+  {name:'rare',      color:'#378ADD',bg:'#041428',chance:1/20,    display:'1 in 20',       resultClass:'result-anim-rare'},
+  {name:'epic',      color:'#AFA9EC',bg:'#12103a',chance:1/100,   display:'1 in 100',      resultClass:'result-anim-epic'},
+  {name:'legendary', color:'#ffd700',bg:'#1a1200',chance:1/500,   display:'1 in 500',      resultClass:'result-anim-legendary'},
+  {name:'mythic',    color:'#ff6fff',bg:'#1a0020',chance:1/5000,  display:'1 in 5,000',    resultClass:'result-anim-mythic'},
   {name:'secret',    color:'#fff',   bg:'#000030',chance:1/1000000,display:'1 in 1,000,000',resultClass:'result-anim-secret'},
 ];
 
-// 500+ titles
 var TITLES_DATA=(function(){
   var common=[
     ['Stardust','💨'],['Sky Gazer','👀'],['Night Owl','🦉'],['Moonwalker','🌙'],['Cloud Drifter','☁️'],
@@ -484,15 +438,6 @@ var TITLES_DATA=(function(){
     ['Spacewalk Rookie','👟'],['Launch Pad','🛫'],['Radio Wave','📻'],['Gravity Well','🕳️'],['Magnetar Pup','🧲'],
     ['Sunspot','🌞'],['Aurora Chaser','🌌'],['Tidal Force','🌊'],['Solar Flare','☀️'],['Ion Trail','⚡'],
     ['Mission Control','🖥️'],['Countdown','⏱️'],['Deorbit','📉'],['Re-Entry','🔥'],['Liftoff','🚀'],
-    ['Apogee','📐'],['Perigee','📏'],['EVA Suit','🥽'],['Hatch Open','🚪'],['Docking Port','🔗'],
-    ['Solar Panel','🔋'],['Thruster Burn','💨'],['Payload Locked','🔒'],['G-Force 1','1️⃣'],['Void Whisperer','👂'],
-    ['Starmap Reader','🗺️'],['Telescope Eye','🔬'],['Planet Hopper','🌍'],['Ringed World','🪐'],['Blue Moon','🔵'],
-    ['White Dwarf','⚪'],['Pulsar Listener','🎧'],['Exoplanet Scout','🔭'],['Atmosphere Grazer','🌬️'],['Space Junk','🗑️'],
-    ['Photon Rider','💡'],['Dark Side','🌑'],['Eclipse Watcher','🌒'],['Retro Rocket','🕹️'],['Booster Stage','💪'],
-    ['Spin Stabilized','🌀'],['Attitude Control','🎛️'],['Star Chart','📜'],['Zenith Point','☝️'],['Red Shift','🔴'],
-    ['Cosmic Glow','🌟'],['Parsec Rookie','📏'],['Light Year Baby','👶'],['AU Traveller','🏃'],['Cargo Pilot','✈️'],
-    ['Heat Shield','🛡️'],['Parachute Packed','🪂'],['Splash Down','💧'],['Recovery Crew','⛑️'],['Nominal Status','✅'],
-    ['T-Minus Watcher','⌛'],['Cosmonaut Fan','🫡'],['Course Correction','🧭'],['Cabin Pressure','💨'],['Crater Counter','🧮'],
   ];
   var uncommon=[
     ['Nebula Drifter','🌫️'],['Pulsar Knight','💫'],['Void Sailor','⛵'],['Quasar Chaser','🔭'],['Dark Matter Fan','🌑'],
@@ -501,16 +446,6 @@ var TITLES_DATA=(function(){
     ['Quark Collector','🧩'],['Event Horizon','🌐'],['Stellar Wind','💨'],['Ion Storm','⛈️'],['Plasma Torch','🔥'],
     ['Magnetosphere','🧲'],['Solar Wind Surfer','🏄'],['Chromosphere','🌈'],['Coronal Loop','🔁'],['Umbra Stalker','🌑'],
     ['Parallax Master','📐'],['Doppler Listener','🎵'],['Blueshift Racer','🔵'],['Accretion Disk','💿'],['Protostar','🌱'],
-    ['Main Sequence','📈'],['Variable Star','🔀'],['Cepheid Pulse','💓'],['Eclipsing Binary','🌑'],['Contact Binary','🤝'],
-    ['Open Cluster','🎯'],['Globular Pilgrim','⚽'],['Dwarf Galaxy','🐣'],['Barred Spiral','🌀'],['Ring Galaxy','💍'],
-    ['Galaxy Merger','🤜'],['Void Region','🌑'],['Filament Traveller','🧵'],['Molecular Cloud','☁️'],['Stellar Nursery','🍼'],
-    ['Asteroid Belt Guard','🛡️'],['Trojan Rider','🐴'],['Lagrange Pilot','✈️'],['Oort Wanderer','☁️'],['Kuiper Diver','🏊'],
-    ['Frozen World','🧊'],['Lava Moon','🌋'],['Tidal Lock','🔒'],['Roche Limit','⚠️'],['Orbital Mechanic','⚙️'],
-    ['Kepler Acolyte','📖'],['Newton Disciple','🍎'],['Einstein Fan','🧠'],['Photon Weaver','🧵'],['Cosmic Clockmaker','⏰'],
-    ['Dark Lane Rider','🛤️'],['Nebula Shepherd','🐑'],['Void Lighthouse','🗼'],['Galaxy Vintner','🍷'],['Void Cartographer','🧭'],
-    ['Galactic Healer','💊'],['Star Medic','🩺'],['Void Electrician','💡'],['Galactic Chef','👨‍🍳'],['Cosmic Brewer','🍺'],
-    ['Protoplanetary Disk','🥏'],['Bok Globule','🫧'],['HII Region','🌡️'],['T-Tauri','🌿'],['Spectral Class B','🔵'],
-    ['Binary Star Fan','♊'],['Trinary Star','3️⃣'],['Elliptical Drifter','⭕'],['Irregular Type','🔷'],['Great Attractor','🌀'],
   ];
   var rare=[
     ['Galactic Ranger','🔭'],['Nova Hunter','🏹'],['Star Admiral','⚓'],['Photon Blade','⚔️'],['Quantum Drifter','⚛️'],
@@ -519,15 +454,6 @@ var TITLES_DATA=(function(){
     ['Hypernova Witness','👁️'],['Magnetar Tamer','🧲'],['Gamma Burst Rider','💥'],['Rogue Planet Rider','🌑'],['Galactic Core Diver','🕳️'],
     ['Dark Matter Sculptor','🌌'],['Cosmic Cartographer','🗺️'],['Star Forge Keeper','⚒️'],['Pulsar Maestro','🎼'],['Nebula Painter','🎨'],
     ['Void Philosopher','🤔'],['Star Oracle','🔮'],['Galaxy Dreamer','💭'],['Celestial Architect','🏛️'],['Starfield Marshal','🤠'],
-    ['Cosmic Wanderer','🚶'],['Nebula Nomad','🎒'],['Void Bard','🎸'],['Galactic Alchemist','⚗️'],['Star Whisperer','🤫'],
-    ['Cosmic Jeweler','💎'],['Starfield Librarian','📚'],['Nebula Archivist','🗃️'],['Galactic Champion','🏆'],['Cosmic Vanguard','⚔️'],
-    ['Starfield Sentinel','🗡️'],['Nebula Paladin','🛡️'],['Void Crusader','✝️'],['Galaxy Poet','📝'],['Star Mechanic','🔩'],
-    ['Cosmic Engineer','🔧'],['Nebula Mechanic','🔩'],['Galaxy Gate Guardian','🚪'],['Void Bard','🎸'],['Cosmic Sage','🧙'],
-    ['Tidal Disruption','🌊'],['Interstellar Drifter','🛸'],['Dark Matter Lord','🌑'],['Cosmic Storm','🌪️'],['Void Reaper','💀'],
-    ['Star Phantom','💨'],['Galaxy Assassin','🗡️'],['Nebula Wraith','👻'],['Cosmic Knight','⚔️'],['Star Paladin','🛡️'],
-    ['Void Ranger','🏹'],['Galaxy Mage','🧙'],['Cosmic Priest','⛪'],['Nebula Witch','🧙‍♀️'],['Star Druid','🌿'],
-    ['Void Monk','🧘'],['Galaxy Warrior','⚔️'],['Cosmic Rogue','🗡️'],['Star Berserker','🪓'],['Nebula Samurai','⛩️'],
-    ['Void Ninja','🥷'],['Galaxy Archer','🏹'],['Cosmic Jester','🃏'],['Star Bard','🎵'],['Void Scholar','📜'],
   ];
   var epic=[
     ['Galactic Emperor','👑'],['Star Sovereign','💫'],['Cosmic Ruler','🌌'],['Nebula Overlord','🌫️'],['Void Supreme','🕳️'],
@@ -536,15 +462,6 @@ var TITLES_DATA=(function(){
     ['Spacetime Bender','🌀'],['Gravity Crusher','🪨'],['Light Speed Breaker','💨'],['Singularity Lord','⚫'],['Dark Energy Master','🔮'],
     ['Galaxy Wraith','👻'],['Nebula Specter','👁️'],['Cosmic Lich','💀'],['Eternal Star','♾️'],['Infinite Cosmos','🔄'],
     ['Timeless Nebula','⏳'],['Boundless Galaxy','🌌'],['Starfield Phoenix','🔥'],['Cosmic Dragon','🐉'],['Nebula Leviathan','🐋'],
-    ['Void Hydra','🐍'],['Galaxy Behemoth','🦣'],['Quantum Sovereign','⚛️'],['Multiverse Master','🪐'],['Hyper Dimensional','📦'],
-    ['Tesseract Rider','🧊'],['Galaxy Admiral','⚓'],['Star Marshal','🤠'],['Nebula Captain','⛵'],['Void Commander','🪖'],
-    ['Event Horizon Surfer','🏄'],['M-Theory Lord','🎶'],['11th Dimension','🔢'],['Calabi-Yau Surfer','🏄'],['String Theory God','🎸'],
-    ['Omniverse Watcher','🌐'],['Parallel World Diver','🌀'],['Antimatter Sovereign','⚛️'],['Zero Point Ruler','⚡'],['Planck Scale Master','🔬'],
-    ['Schrödinger Cat','🐱'],['Heisenberg Uncertain','❓'],['Pauli Exclusion Lord','🚫'],['Maxwell Demon','😈'],['Boltzmann Brain','🧠'],
-    ['Fermi Paradox Solver','🛸'],['Drake Equation','🔢'],['Kardashev III','⚡'],['Dyson Sphere','🌞'],['Matrioshka Brain','🧅'],
-    ['Von Neumann Machine','🤖'],['Simulation Breaker','💻'],['Base Reality Lord','🏠'],['Meta Universe','🌌'],['Omega Point','⬆️'],
-    ['Transcendence Born','✨'],['Singularity Reached','🎯'],['Post Human','🧬'],['Mind Upload','💾'],['Digital Ascendant','💿'],
-    ['Void Sovereign','🕳️'],['Galaxy Legend','🌟'],['Cosmic Apex','⬆️'],['Star Apex','⭐'],['Nebula Apex','🌫️'],
   ];
   var legendary=[
     ['Stellar Oracle','🌟'],['Galaxy Prophet','📯'],['Cosmic Seer','🔮'],['Void Diviner','🌑'],['Star Augur','⭐'],
@@ -552,35 +469,18 @@ var TITLES_DATA=(function(){
     ['Eternal Champion','🏆'],['Infinite Warrior','⚔️'],['Boundless Sage','📚'],['Timeless Hero','🦸'],['Star Born Legend','👶'],
     ['Cosmic Heir','👑'],['Galaxy Blessed','🙏'],['Divine Star','✡️'],['Celestial One','☀️'],['Sacred Cosmos','🌌'],
     ['Golden Nova','🥇'],['Platinum Pulsar','⚪'],['Diamond Galaxy','💎'],['Crystal Cosmos','🔷'],['Obsidian Void','⬛'],
-    ['Sapphire Star','🔵'],['Ruby Nova','🔴'],['Emerald Nebula','💚'],['Amber Quasar','🟡'],['Amethyst Galaxy','💜'],
-    ['Cosmic Seraph','👼'],['Star Archangel','😇'],['Nebula Cherubim','💕'],['Void Angel','🪶'],['Galactic Deity','⚡'],
-    ['Universe Sculptor','🏗️'],['Reality Architect','🏛️'],['Existence Weaver','🧵'],['Cosmos Painter','🎨'],['Creation Master','🖌️'],
-    ['Omnipotent Star','⭐'],['Omniscient Void','🕳️'],['Omnipresent Cosmos','🌌'],['All Seeing Eye','👁️'],['Infinite Knowledge','📚'],
-    ['Alpha Cosmic','α'],['Omega Cosmic','Ω'],['First Star','1️⃣'],['Last Star','🔟'],['Only Star','⭐'],
-    ['Time Lord','⏰'],['Space Shaper','🌌'],['Reality Ruler','👑'],['Dimension King','🪐'],['Universe Queen','👸'],
-    ['Cosmic Empress','👑'],['Galaxy Pharaoh','🏺'],['Star Shogun','⛩️'],['Void Caesar','🏛️'],['Nebula Tsar','👑'],
-    ['Eternal Fire','🔥'],['Undying Light','💡'],['Immortal Nova','💥'],['Endless Energy','⚡'],['Forever Star','⭐'],
-    ['Beyond Death','💀'],['After Universe','🌌'],['Pre-Existence','⏮️'],['Post-Reality','⏭️'],['Outside Time','⏸️'],
   ];
   var mythic=[
     ['Absolute Zero','🧊'],['Big Bang Witness','💥'],['Universe Forger','🔨'],['Reality Weaver','🧵'],['Existence Shaper','🌍'],
     ['Cosmos Architect','🏗️'],['Void Prime','⚫'],['Stellar Omega','Ω'],['Galaxy Alpha','α'],['Universal Null','∅'],
     ['Singularity Prime','🕳️'],['Entropy Master','♻️'],['Thermodynamic God','🌡️'],['Quantum Foam','🫧'],['Zero Point Energy','⚡'],
     ['Higgs Field Lord','🌊'],['Planck Scale Diver','🤿'],['Loop Quantum God','🔁'],['Causal Diamond','💎'],['Multiverse Emperor','🌐'],
-    ['Omniverse Sovereign','♾️'],['Beyond Universe','🚀'],['Pre-Big Bang','⏮️'],['Post Heat Death','⏭️'],['Immortal Star God','👁️'],
-    ['Eternal Void King','🌑'],['Absolute Cosmic','🌌'],['Prime Universe','🏆'],['God of Stars','⭐'],['Creator of Worlds','🌍'],
-    ['Destroyer of Worlds','💥'],['Maker of Time','⏰'],['Breaker of Space','🌌'],['Master of Fate','🎲'],['Lord of All','👑'],
-    ['Source of Light','💡'],['Origin of Dark','🌑'],['Heart of Cosmos','❤️'],['Soul of Universe','👻'],['Mind of God','🧠'],
-    ['First Cause','🔄'],['Final Cause','⏹️'],['Prime Mover','⚡'],['Unmoved Mover','🧘'],['Necessary Being','♾️'],
   ];
-  var secret=[['⭐','⭐']];
-
+  var secret=[['⭐ The One ⭐','⭐']];
   function make(arr,r){return arr.map(function(a){return {n:a[0],i:a[1],r:r};});}
   return make(common,0).concat(make(uncommon,1)).concat(make(rare,2)).concat(make(epic,3)).concat(make(legendary,4)).concat(make(mythic,5)).concat(make(secret,6));
 })();
 
-// 1000+ cosmetics
-// Cosmetic rarity config
 var COSM_RARITIES=[
   {id:'common',    label:'Common',    color:'#888780',bg:'#1a1a1a'},
   {id:'uncommon',  label:'Uncommon',  color:'#5DCAA5',bg:'#04201a'},
@@ -589,115 +489,60 @@ var COSM_RARITIES=[
   {id:'legendary', label:'Legendary', color:'#ffd700',bg:'#1a1200'},
   {id:'mythic',    label:'Mythic',    color:'#ff6fff',bg:'#1a0020'},
 ];
-// Prices per rarity
 var COSM_PRICES=[50,250,1000,5000,25000,100000];
 
 var COSMETICS_DATA=(function(){
-  // [name, icon, rarity(0-5)]
   var cats=[
-    {id:'hair', label:'👱 hair', items:[
+    {id:'hair',label:'👱 hair',items:[
       ['Spike','💇',0],['Messy','🌀',0],['Bob Cut','✂️',0],['Afro','☁️',0],['Ponytail','🎀',0],
       ['Bun','🍥',0],['Braids','🪢',1],['Mohawk','⚡',1],['Dreadlocks','🌿',1],['Curly','🌊',0],
-      ['Straight Long','📏',0],['Pixie Cut','✨',1],['Undercut','🔪',1],['Quiff','💨',0],['Fade','💈',1],
-      ['Cornrows','🎶',1],['Twists','🌀',1],['Bangs','🌅',0],['Side Part','📐',0],['Center Part','🎯',0],
-      ['Space Buns','🌕',2],['Double Buns','🍡',1],['Low Ponytail','🎗️',0],['High Ponytail','🏔️',0],['Half Up','🌓',1],
-      ['Pigtails','🎀',0],['Braid Crown','👑',2],['French Braid','🇫🇷',1],['Dutch Braid','🌷',1],['Fishtail','🐟',2],
-      ['Locs','🌿',1],['Coils','🌀',1],['Taper','📉',0],['Crew Cut','🪖',0],['Buzz Cut','✂️',0],
-      ['Pompadour','🎸',2],['Slicked Back','⬆️',1],['Comb Over','➡️',0],['Top Knot','🔝',1],['Man Bun','🧿',1],
-      ['Wild Mane','🦁',2],['Wavy','🌊',0],['Layered','🏔️',1],['Feathered','🪶',2],['Crimped','〰️',1],
-      ['Shaved Sides','⚡',1],['Bowl Cut','🥣',0],['Mushroom Cut','🍄',1],['Wolf Cut','🐺',3],['Rainbow Mane','🌈',4],
+      ['Space Buns','🌕',2],['Double Buns','🍡',1],['Braid Crown','👑',2],['Wolf Cut','🐺',3],['Rainbow Mane','🌈',4],
     ]},
-    {id:'hat', label:'🎩 hats', items:[
-      ['Baseball Cap','🧢',0],['Beanie','🧶',0],['Sun Hat','☀️',0],['Bucket Hat','🪣',0],['Snapback','🔙',0],
-      ['Trucker Hat','🚛',0],['Beret','🇫🇷',1],['Fedora','🎩',1],['Top Hat','🎩',1],['Cowboy Hat','🤠',1],
-      ['Pirate Hat','☠️',1],['Party Hat','🎉',0],['Wizard Hat','🧙',2],['Witch Hat','🧙‍♀️',2],['Graduation Cap','🎓',1],
-      ['Chef Hat','👨‍🍳',1],['Santa Hat','🎅',1],['Elf Hat','🧝',1],['Fez','🎭',1],['Hard Hat','🪖',0],
-      ['Ninja Headband','🥷',2],['Viking Helmet','⚔️',2],['Knight Helmet','🛡️',2],['Samurai Helm','⛩️',2],['Roman Helm','🏛️',2],
-      ['Spartan Helm','💪',2],['Jester Hat','🃏',2],['Bunny Ears','🐰',1],['Cat Ears','🐱',1],['Fox Ears','🦊',2],
-      ['Wolf Ears','🐺',2],['Bear Ears','🐻',1],['Antlers','🦌',2],['Flower Crown','🌸',2],['Laurel Wreath','🌿',2],
-      ['Astronaut Hat','👨‍🚀',3],['Space Helmet','🪖',3],['Crown','👑',3],['Pharaoh Crown','🏺',3],['Star Crown','⭐',3],
-      ['King Crown','👑',4],['Queen Tiara','👸',4],['Diamond Crown','💎',4],['Halo','😇',4],['Horns','😈',3],
-      ['Galaxy Crown','🌌',4],['Nebula Hat','🌫️',4],['Comet Cap','☄️',3],['Planet Hat','🪐',3],['Cosmic Halo','✨',5],
+    {id:'hat',label:'🎩 hats',items:[
+      ['Baseball Cap','🧢',0],['Beanie','🧶',0],['Sun Hat','☀️',0],['Bucket Hat','🪣',0],['Fedora','🎩',1],
+      ['Top Hat','🎩',1],['Cowboy Hat','🤠',1],['Pirate Hat','☠️',1],['Wizard Hat','🧙',2],['Witch Hat','🧙‍♀️',2],
+      ['Viking Helmet','⚔️',2],['Knight Helmet','🛡️',2],['Astronaut Hat','👨‍🚀',3],['Crown','👑',3],['King Crown','👑',4],
+      ['Galaxy Crown','🌌',4],['Cosmic Halo','✨',5],
     ]},
-    {id:'eyes', label:'👁️ eyes', items:[
-      ['Sunglasses','🕶️',0],['Goggles','🥽',0],['Monocle','🧐',1],['3D Glasses','🎬',1],['Sleepy','😴',0],
-      ['Winking','😉',0],['Pixel Eyes','👾',1],['Visor','🔭',1],['Cyber Visor','🤖',2],['Cat Eyes','🐱',1],
-      ['Snake Eyes','🐍',2],['Star Eyes','⭐',2],['Heart Eyes','💖',1],['Angel Eyes','😇',2],['Demon Eyes','😈',2],
-      ['Crying Stars','💫',2],['Rainbow Eyes','🌈',3],['Fire Eyes','🔥',2],['Ice Eyes','🧊',2],['Thunder Eyes','⚡',2],
-      ['Alien Eyes','👽',3],['Robot Eyes','🤖',2],['Ghost Eyes','👻',2],['Cyclops','🌑',3],['Third Eye','👁️',3],
-      ['Spiral Eyes','🌀',2],['Diamond Eyes','💎',3],['Gold Eyes','🥇',3],['Laser Eyes','🔴',3],['Butterfly Eyes','🦋',3],
-      ['Flower Eyes','🌸',2],['Cosmic Eyes','🌌',4],['Galaxy Eyes','🌌',4],['Void Eyes','🕳️',4],['Neon Eyes','💡',3],
-      ['Binary Eyes','01',3],['Matrix Eyes','🟩',3],['Dragon Eyes','🐉',4],['Silver Eyes','⚪',3],['Nebula Eyes','🌫️',5],
+    {id:'eyes',label:'👁️ eyes',items:[
+      ['Sunglasses','🕶️',0],['Goggles','🥽',0],['Monocle','🧐',1],['Cyber Visor','🤖',2],['Cat Eyes','🐱',1],
+      ['Star Eyes','⭐',2],['Heart Eyes','💖',1],['Fire Eyes','🔥',2],['Ice Eyes','🧊',2],['Alien Eyes','👽',3],
+      ['Third Eye','👁️',3],['Laser Eyes','🔴',3],['Cosmic Eyes','🌌',4],['Void Eyes','🕳️',4],['Nebula Eyes','🌫️',5],
     ]},
-    {id:'mouth', label:'👄 mouth', items:[
-      ['Smile','😊',0],['Big Grin','😁',0],['Cool Smirk','😏',0],['Frown','☹️',0],['Shocked','😮',0],
-      ['Tongue Out','😛',0],['Zipper Mouth','🤐',1],['Freckles','✨',0],['Blush','💕',0],['Stubble','🥸',0],
-      ['Moustache','👨',0],['Beard','🧔',0],['Goatee','🐐',0],['Braces','🦷',0],['Buck Teeth','🦫',0],
-      ['Fangs','🧛',1],['Lipstick Red','💄',1],['Lipstick Blue','💋',2],['Lipstick Black','🖤',2],['Lipstick Gold','💛',3],
-      ['Star Mouth','⭐',2],['Heart Mouth','❤️',1],['Fire Mouth','🔥',3],['Paint Stripe','🖌️',2],['Grillz','💎',3],
+    {id:'mouth',label:'👄 mouth',items:[
+      ['Smile','😊',0],['Big Grin','😁',0],['Cool Smirk','😏',0],['Tongue Out','😛',0],['Moustache','👨',0],
+      ['Beard','🧔',0],['Fangs','🧛',1],['Lipstick Red','💄',1],['Lipstick Gold','💛',3],['Grillz','💎',3],
     ]},
-    {id:'shirt', label:'👕 tops', items:[
-      ['T-Shirt','👕',0],['Tank Top','🎽',0],['Sweater','🧶',0],['Polo','🏌️',0],['Flannel','🎿',0],
-      ['Striped Top','〰️',0],['Camo Top','🎖️',0],['Hoodie','🧥',1],['Jacket','🧥',1],['Cardigan','🪡',1],
-      ['Blazer','👔',1],['Denim Jacket','🧲',1],['Varsity Jacket','🏈',1],['Windbreaker','💨',1],['Hawaiian Shirt','🌺',1],
-      ['Floral Top','🌸',1],['Polka Dots','⚬',1],['Tie Dye','🎨',2],['Crop Top','✂️',1],['Vest','🦺',1],
-      ['Kimono Top','⛩️',2],['Hanbok Top','🌸',2],['Saree Top','🇮🇳',2],['Dashiki','🌍',2],['Poncho','🌮',1],
-      ['Suit','🤵',2],['Tuxedo','🎩',2],['Leather Jacket','🏍️',2],['Corset','🎀',2],['Off Shoulder','👗',1],
-      ['Lab Coat','🥼',2],['Pirate Coat','☠️',2],['Ninja Gi','🥷',3],['Samurai Robe','⛩️',3],['Knight Armor','⚔️',3],
-      ['Wizard Robe','🧙',3],['Space Suit','👨‍🚀',3],['Armor','🛡️',3],['Cape','🦸',2],['Rainbow Shirt','🌈',2],
-      ['Flame Top','🔥',3],['Ice Top','🧊',3],['Thunder Top','⚡',3],['Neon Top','💡',3],['Nebula Hoodie','🌫️',4],
-      ['Galaxy Top','🌌',4],['Star Shirt','⭐',4],['Cosmic Tee','✨',4],['Void Robe','🕳️',4],['Celestial Armor','👼',5],
+    {id:'shirt',label:'👕 tops',items:[
+      ['T-Shirt','👕',0],['Hoodie','🧥',1],['Blazer','👔',1],['Kimono Top','⛩️',2],['Suit','🤵',2],
+      ['Knight Armor','⚔️',3],['Wizard Robe','🧙',3],['Space Suit','👨‍🚀',3],['Nebula Hoodie','🌫️',4],['Celestial Armor','👼',5],
     ]},
-    {id:'pants', label:'👖 pants', items:[
-      ['Jeans','👖',0],['Shorts','🩳',0],['Sweatpants','🏃',0],['Cargo Pants','🎒',0],['Striped Pants','〰️',0],
-      ['Camo Shorts','🎖️',0],['Joggers','🏋️',0],['Chinos','👔',1],['Dress Pants','🤵',1],['Linen Pants','🌿',1],
-      ['Skinny Jeans','📏',1],['Wide Leg','🌊',1],['Flared','🌀',1],['Ripped Jeans','✂️',1],['High Waist','⬆️',1],
-      ['Overalls','👷',1],['Dungarees','🔧',1],['Biker Shorts','🚴',1],['Board Shorts','🏄',1],['Swim Trunks','🏊',0],
-      ['Skirt','👗',1],['Mini Skirt','📏',1],['Maxi Skirt','📏',1],['Pleated Skirt','🌀',2],['Wrap Skirt','🎀',2],
-      ['Kilt','🏴󠁧󠁢󠁳󠁣󠁴󠁿',2],['Hakama','⛩️',2],['Leather Pants','🏍️',2],['Track Pants','🏆',1],['Tie Dye Shorts','🎨',2],
-      ['Flame Pants','🔥',3],['Ice Shorts','🧊',3],['Neon Pants','💡',3],['Star Shorts','⭐',3],['Cosmic Leggings','✨',3],
-      ['Galaxy Pants','🌌',4],['Void Leggings','🕳️',4],['Nebula Pants','🌫️',4],['Thunder Shorts','⚡',3],['Rainbow Pants','🌈',3],
+    {id:'pants',label:'👖 pants',items:[
+      ['Jeans','👖',0],['Shorts','🩳',0],['Cargo Pants','🎒',0],['Chinos','👔',1],['Hakama','⛩️',2],
+      ['Flame Pants','🔥',3],['Galaxy Pants','🌌',4],['Void Leggings','🕳️',4],['Rainbow Pants','🌈',3],
     ]},
-    {id:'shoes', label:'👟 shoes', items:[
-      ['Sneakers','👟',0],['Sandals','🩴',0],['Flip Flops','🩴',0],['Loafers','🥿',0],['Slip Ons','🛹',0],
-      ['Oxford Shoes','👞',0],['Dress Shoes','👞',1],['High Tops','👟',1],['Low Tops','👟',0],['Running Shoes','🏃',1],
-      ['Boots','🥾',1],['Ankle Boots','🦶',1],['Chelsea Boots','🎸',2],['Hiking Boots','🏔️',1],['Work Boots','🔨',1],
-      ['Cleats','⚽',1],['Basketball Shoes','🏀',1],['Roller Skates','🛼',2],['Ice Skates','⛸️',2],['Platforms','🏔️',2],
-      ['Heels','👠',2],['Stilettos','👡',2],['Wedges','📐',2],['Mules','🫏',1],['Knee Boots','🦵',2],
-      ['Cowboy Boots','🤠',2],['Rain Boots','🌧️',1],['Snow Boots','❄️',2],['Military Boots','🪖',2],['Combat Boots','⚔️',2],
-      ['Neon Sneakers','💡',3],['Fire Boots','🔥',3],['Moon Boots','🌕',3],['Cloud Shoes','☁️',3],['Rocket Boots','🚀',3],
-      ['Galaxy Shoes','🌌',4],['Star Sneakers','⭐',4],['Cosmic Boots','✨',4],['Void Slippers','🕳️',4],['Nebula Heels','🌫️',4],
+    {id:'shoes',label:'👟 shoes',items:[
+      ['Sneakers','👟',0],['Boots','🥾',1],['Cowboy Boots','🤠',2],['Neon Sneakers','💡',3],['Rocket Boots','🚀',3],
+      ['Galaxy Shoes','🌌',4],['Cosmic Boots','✨',4],['Nebula Heels','🌫️',4],
     ]},
-    {id:'acc', label:'✨ acc', items:[
-      ['Backpack','🎒',0],['Scarf','🧣',0],['Tie','👔',0],['Belt','🥋',0],['Socks','🧦',0],
-      ['Gloves','🧤',0],['Watch','⌚',1],['Bow Tie','🎀',1],['Necklace','📿',1],['Earrings','💎',1],
-      ['Ring','💍',1],['Bracelet','📿',1],['Suspenders','⬆️',1],['Headphones','🎧',1],['Camera','📷',1],
-      ['Book','📚',1],['Scroll','📜',1],['Mittens','🧤',0],['Knee Socks','🦵',0],['Arm Warmers','🌡️',1],
-      ['Star Necklace','⭐',2],['Anklet','🔗',1],['Guitar','🎸',2],['Wand','🪄',2],['Staff','🔱',2],
-      ['Shield','🛡️',2],['Sword','⚔️',2],['Lightsaber','💡',3],['Cape','🦸',2],['Hoverboard','🛹',3],
-      ['Jetpack','🚀',3],['Wings','🪶',3],['Aura','✨',3],['Fire Aura','🔥',3],['Ice Aura','🧊',3],
-      ['Thunder Aura','⚡',3],['Star Aura','🌟',4],['Rainbow Aura','🌈',4],['Galaxy Aura','🌌',4],['Cosmic Aura','💫',4],
-      ['Void Aura','🕳️',4],['Nebula Aura','🌫️',4],['Celestial Wings','🪶',4],['Angel Wings','😇',4],['Devil Wings','😈',4],
-      ['Dragon Wings','🐉',5],['Butterfly Wings','🦋',3],['Dragon Companion','🐉',5],['Tail Star','⭐',4],['Nova Burst','💥',5],
+    {id:'acc',label:'✨ acc',items:[
+      ['Backpack','🎒',0],['Scarf','🧣',0],['Watch','⌚',1],['Necklace','📿',1],['Headphones','🎧',1],
+      ['Star Necklace','⭐',2],['Sword','⚔️',2],['Lightsaber','💡',3],['Jetpack','🚀',3],['Wings','🪶',3],
+      ['Star Aura','🌟',4],['Galaxy Aura','🌌',4],['Void Aura','🕳️',4],['Dragon Wings','🐉',5],['Nova Burst','💥',5],
     ]},
   ];
-
   var result=[];
   cats.forEach(function(cat){
     cat.items.forEach(function(item,idx){
       var r=item[2]||0;
-      result.push({
-        id:cat.id+'_'+idx,cat:cat.id,catLabel:cat.label,
-        name:item[0],icon:item[1],rarity:r,
-        price:COSM_PRICES[r],
-      });
+      result.push({id:cat.id+'_'+idx,cat:cat.id,catLabel:cat.label,name:item[0],icon:item[1],rarity:r,price:COSM_PRICES[r]});
     });
   });
   return result;
 })();
 
 var COSM_CATS=[
-  {id:'hair',label:'👱 hair'},{id:'hat',label:'🎩 hats'},{id:'eyes',label:'👁️ eyes'},
+  {id:'skin',label:'🎨 skin'},{id:'hair',label:'👱 hair'},{id:'hat',label:'🎩 hats'},{id:'eyes',label:'👁️ eyes'},
   {id:'mouth',label:'👄 mouth'},{id:'shirt',label:'👕 tops'},{id:'pants',label:'👖 pants'},
   {id:'shoes',label:'👟 shoes'},{id:'acc',label:'✨ acc'},
 ];
@@ -721,21 +566,18 @@ var UPGRADES=[
 // STATE
 // ============================================================
 var state={
-  loggedIn:false,
-  username:'',
-  count:0,perClick:1,cps:0,
+  loggedIn:false,username:'',count:0,perClick:1,cps:0,
   spinsAvailable:0,clicksSinceLastSpin:0,
   equippedTitle:null,ownedTitles:[],
   gender:'m',skinColor:'#FFDBB4',hairColor:'#1a0800',
   equipped:{},ownedCosmetics:{},
   upgrades:JSON.parse(JSON.stringify(UPGRADES)),
-  currentCosmCat:'hair',
-  reelSpinning:false,
+  currentCosmCat:'skin',reelSpinning:false,
 };
 var SPIN_EVERY=500;
 
 // ============================================================
-// STORAGE HELPERS
+// STORAGE
 // ============================================================
 function storageKey(user){return 'sc_user_'+user;}
 function saveUser(){
@@ -755,24 +597,10 @@ function loadUser(username){
   if(!raw)return null;
   try{return JSON.parse(raw);}catch(e){return null;}
 }
-function getUserList(){
-  var raw=localStorage.getItem('sc_users');
-  try{return JSON.parse(raw)||{};}catch(e){return {};}
-}
-function registerUser(username,password){
-  var users=getUserList();
-  if(users[username])return false;
-  users[username]=btoa(password);
-  localStorage.setItem('sc_users',JSON.stringify(users));
-  return true;
-}
-function checkPassword(username,password){
-  var users=getUserList();
-  return users[username]===btoa(password);
-}
-function userExists(username){
-  return !!getUserList()[username];
-}
+function getUserList(){var raw=localStorage.getItem('sc_users');try{return JSON.parse(raw)||{};}catch(e){return {};}}
+function registerUser(username,password){var users=getUserList();if(users[username])return false;users[username]=btoa(password);localStorage.setItem('sc_users',JSON.stringify(users));return true;}
+function checkPassword(username,password){return getUserList()[username]===btoa(password);}
+function userExists(username){return !!getUserList()[username];}
 
 // ============================================================
 // AUTH
@@ -797,8 +625,7 @@ function doLogin(){
     state.equippedTitle=data.equippedTitle||null;state.ownedTitles=data.ownedTitles||[];
     state.gender=data.gender||'m';state.skinColor=data.skinColor||'#FFDBB4';
     state.hairColor=data.hairColor||'#1a0800';
-    state.equipped=data.equipped||{};
-    state.ownedCosmetics=data.ownedCosmetics||{};
+    state.equipped=data.equipped||{};state.ownedCosmetics=data.ownedCosmetics||{};
     state.upgrades=data.upgrades||JSON.parse(JSON.stringify(UPGRADES));
     if(data.isNew){showSetup();}else{enterMain();}
   }else{showSetup();}
@@ -824,15 +651,14 @@ function doLogout(){
 // ============================================================
 // SETUP
 // ============================================================
-var selectedGender='m';
-var selectedSkin='#FFDBB4';
+var selectedGender='m';var selectedSkin='#FFDBB4';
 function showSetup(){
   document.getElementById('setup-name').textContent=state.username;
   var sg=document.getElementById('setup-skin-grid');sg.innerHTML='';
   SKIN_COLORS.forEach(function(s){
     var sw=document.createElement('div');sw.className='skin-swatch'+(s.hex===selectedSkin?' selected':'');
     sw.style.background=s.hex;sw.title=s.name;
-    sw.onclick=function(){selectedSkin=s.hex;document.querySelectorAll('.skin-swatch').forEach(function(x){x.classList.remove('selected');});sw.classList.add('selected');};
+    sw.onclick=function(){selectedSkin=s.hex;document.querySelectorAll('#setup-skin-grid .skin-swatch').forEach(function(x){x.classList.remove('selected');});sw.classList.add('selected');};
     sg.appendChild(sw);
   });
   showScreen('setup-screen');
@@ -885,17 +711,6 @@ function buildAvatarSVG(size,opts){
   var hairCol=s.hair||state.hairColor||'#1a0800';
   var gender=s.gender||state.gender||'m';
   var eq=s.equipped||state.equipped||{};
-  var sc=size/100;
-
-  var hatItem=eq.hat?COSMETICS_DATA.find(function(c){return c.id===eq.hat;}):null;
-  var hairItem=eq.hair?COSMETICS_DATA.find(function(c){return c.id===eq.hair;}):null;
-  var eyeItem=eq.eyes?COSMETICS_DATA.find(function(c){return c.id===eq.eyes;}):null;
-  var mouthItem=eq.mouth?COSMETICS_DATA.find(function(c){return c.id===eq.mouth;}):null;
-  var shirtItem=eq.shirt?COSMETICS_DATA.find(function(c){return c.id===eq.shirt;}):null;
-  var pantsItem=eq.pants?COSMETICS_DATA.find(function(c){return c.id===eq.pants;}):null;
-  var shoesItem=eq.shoes?COSMETICS_DATA.find(function(c){return c.id===eq.shoes;}):null;
-  var accItem=eq.acc?COSMETICS_DATA.find(function(c){return c.id===eq.acc;}):null;
-
   var W=size,H=size*1.5;
   var cx=W/2;
   var headY=H*0.22;var headR=W*0.22;
@@ -904,53 +719,35 @@ function buildAvatarSVG(size,opts){
   var legY=bodyY+bodyH;var legW=W*0.13;var legH=H*0.22;var legGap=W*0.08;
   var footW=W*0.12;var footH=H*0.05;
   var armY=bodyY+H*0.02;var armW=W*0.1;var armH=H*0.22;var armOff=bodyW/2+armW*0.3;
-
+  var hatItem=eq.hat?COSMETICS_DATA.find(function(c){return c.id===eq.hat;}):null;
+  var hairItem=eq.hair?COSMETICS_DATA.find(function(c){return c.id===eq.hair;}):null;
+  var eyeItem=eq.eyes?COSMETICS_DATA.find(function(c){return c.id===eq.eyes;}):null;
+  var mouthItem=eq.mouth?COSMETICS_DATA.find(function(c){return c.id===eq.mouth;}):null;
+  var shirtItem=eq.shirt?COSMETICS_DATA.find(function(c){return c.id===eq.shirt;}):null;
+  var pantsItem=eq.pants?COSMETICS_DATA.find(function(c){return c.id===eq.pants;}):null;
+  var shoesItem=eq.shoes?COSMETICS_DATA.find(function(c){return c.id===eq.shoes;}):null;
+  var accItem=eq.acc?COSMETICS_DATA.find(function(c){return c.id===eq.acc;}):null;
   var shirtColor=shirtItem?'#4a90d9':'#2a2a7a';
   var pantsColor=pantsItem?'#3a6ea8':'#1a3a6a';
   var shoeColor=shoesItem?'#8B4513':'#1a1a3a';
-
   var svg='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">';
-
-  // aura / acc behind
   if(accItem&&(accItem.name.indexOf('Aura')>-1||accItem.name.indexOf('Wing')>-1)){
     svg+='<text x="'+cx+'" y="'+(headY)+'" text-anchor="middle" font-size="'+(W*0.5)+'px" opacity="0.6">'+accItem.icon+'</text>';
   }
-
-  // shoes
   svg+='<rect x="'+(cx-legGap-legW*0.5-footW*0.5)+'" y="'+(legY+legH-footH)+'" width="'+footW+'" height="'+footH+'" rx="'+(footH*0.5)+'" fill="'+shoeColor+'"/>';
   svg+='<rect x="'+(cx+legGap-legW*0.5+legW*0.5-footW*0.5)+'" y="'+(legY+legH-footH)+'" width="'+footW+'" height="'+footH+'" rx="'+(footH*0.5)+'" fill="'+shoeColor+'"/>';
-  if(shoesItem){
-    svg+='<text x="'+(cx-legGap)+'" y="'+(legY+legH+H*0.02)+'" text-anchor="middle" font-size="'+(W*0.12)+'px">'+shoesItem.icon+'</text>';
-  }
-
-  // legs
+  if(shoesItem)svg+='<text x="'+(cx-legGap)+'" y="'+(legY+legH+H*0.02)+'" text-anchor="middle" font-size="'+(W*0.12)+'px">'+shoesItem.icon+'</text>';
   svg+='<rect x="'+(cx-legGap-legW)+'" y="'+legY+'" width="'+legW+'" height="'+legH+'" rx="'+(legW*0.4)+'" fill="'+pantsColor+'"/>';
   svg+='<rect x="'+(cx+legGap)+'" y="'+legY+'" width="'+legW+'" height="'+legH+'" rx="'+(legW*0.4)+'" fill="'+pantsColor+'"/>';
-
-  // arms
   svg+='<rect x="'+(cx-armOff-armW)+'" y="'+armY+'" width="'+armW+'" height="'+armH+'" rx="'+(armW*0.5)+'" fill="'+skin+'"/>';
   svg+='<rect x="'+(cx+armOff)+'" y="'+armY+'" width="'+armW+'" height="'+armH+'" rx="'+(armW*0.5)+'" fill="'+skin+'"/>';
-
-  // body
   var bodyX=cx-bodyW/2;
   svg+='<rect x="'+bodyX+'" y="'+bodyY+'" width="'+bodyW+'" height="'+bodyH+'" rx="'+(W*0.06)+'" fill="'+shirtColor+'"/>';
-  if(shirtItem){svg+='<text x="'+cx+'" y="'+(bodyY+bodyH*0.55)+'" text-anchor="middle" font-size="'+(W*0.2)+'px" dominant-baseline="middle">'+shirtItem.icon+'</text>';}
-
-  // neck
+  if(shirtItem)svg+='<text x="'+cx+'" y="'+(bodyY+bodyH*0.55)+'" text-anchor="middle" font-size="'+(W*0.2)+'px" dominant-baseline="middle">'+shirtItem.icon+'</text>';
   svg+='<rect x="'+(cx-neckW/2)+'" y="'+neckY+'" width="'+neckW+'" height="'+neckH+'" fill="'+skin+'"/>';
-
-  // head
   svg+='<circle cx="'+cx+'" cy="'+headY+'" r="'+headR+'" fill="'+skin+'"/>';
-
-  // hair behind head
-  var hairEmoji=hairItem?hairItem.icon:(gender==='f'?'💁‍♀️':'');
-  if(!hatItem){
-    svg+='<rect x="'+(cx-headR*0.95)+'" y="'+(headY-headR)+'" width="'+(headR*1.9)+'" height="'+(headR*0.7)+'" rx="'+(headR*0.9)+'" fill="'+hairCol+'"/>';
-  }
-
-  // eyes
-  var eyeY=headY-headR*0.05;
-  var eyeSpread=headR*0.35;
+  if(!hatItem)svg+='<rect x="'+(cx-headR*0.95)+'" y="'+(headY-headR)+'" width="'+(headR*1.9)+'" height="'+(headR*0.7)+'" rx="'+(headR*0.9)+'" fill="'+hairCol+'"/>';
+  var eyeY=headY-headR*0.05;var eyeSpread=headR*0.35;
   if(eyeItem){
     svg+='<text x="'+cx+'" y="'+(eyeY+W*0.05)+'" text-anchor="middle" font-size="'+(W*0.18)+'px" dominant-baseline="middle">'+eyeItem.icon+'</text>';
   }else{
@@ -959,27 +756,20 @@ function buildAvatarSVG(size,opts){
     svg+='<circle cx="'+(cx-eyeSpread)+'" cy="'+eyeY+'" r="'+(W*0.018)+'" fill="#222"/>';
     svg+='<circle cx="'+(cx+eyeSpread)+'" cy="'+eyeY+'" r="'+(W*0.018)+'" fill="#222"/>';
   }
-
-  // mouth
   var mouthY=headY+headR*0.42;
   if(mouthItem){
     svg+='<text x="'+cx+'" y="'+(mouthY+W*0.04)+'" text-anchor="middle" font-size="'+(W*0.14)+'px" dominant-baseline="middle">'+mouthItem.icon+'</text>';
   }else{
     svg+='<path d="M '+(cx-headR*0.22)+' '+mouthY+' Q '+cx+' '+(mouthY+headR*0.2)+' '+(cx+headR*0.22)+' '+mouthY+'" stroke="#c07070" stroke-width="'+(W*0.018)+'" fill="none" stroke-linecap="round"/>';
   }
-
-  // hat
   if(hatItem){
     svg+='<text x="'+cx+'" y="'+(headY-headR*0.7)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(headR*1.2)+'px">'+hatItem.icon+'</text>';
   }else if(hairItem){
     svg+='<text x="'+cx+'" y="'+(headY-headR*0.65)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(headR*0.95)+'px">'+hairItem.icon+'</text>';
   }
-
-  // acc front (non-wing/aura)
   if(accItem&&accItem.name.indexOf('Aura')===-1&&accItem.name.indexOf('Wing')===-1){
     svg+='<text x="'+(cx+bodyW*0.35)+'" y="'+(armY+armH*0.4)+'" text-anchor="middle" font-size="'+(W*0.18)+'px">'+accItem.icon+'</text>';
   }
-
   svg+='</svg>';
   return svg;
 }
@@ -1035,7 +825,7 @@ function showPop(cx,cy){
   var pop=document.createElement('div');pop.className='star-pop';pop.textContent='+'+fmt(state.perClick);
   pop.style.left=(cx-r.left+(Math.random()*22-11))+'px';pop.style.top=(cy-r.top-12)+'px';
   wrap.appendChild(pop);
-  ['✨','💫','⭐','🌟'].forEach(function(ic,i){
+  ['✨','💫','⭐','🌟'].forEach(function(ic){
     var s=document.createElement('div');s.className='spark';s.textContent=ic;
     var a=Math.random()*Math.PI*2,d=30+Math.random()*40;
     s.style.setProperty('--dx',Math.cos(a)*d+'px');s.style.setProperty('--dy',Math.sin(a)*d+'px');
@@ -1055,7 +845,7 @@ function doClick(e){
 }
 
 // ============================================================
-// SPIN / REEL
+// SPIN
 // ============================================================
 function pickTitle(){
   var total=RARITIES.reduce(function(a,b){return a+b.chance;},0);
@@ -1071,9 +861,7 @@ function pickTitle(){
 }
 
 function buildReelInitial(){
-  var track=document.getElementById('reel-track');
-  if(!track)return;
-  track.innerHTML='';
+  var track=document.getElementById('reel-track');if(!track)return;track.innerHTML='';
   for(var i=0;i<20;i++){
     var t=TITLES_DATA[Math.floor(Math.random()*TITLES_DATA.length)];
     var rar=RARITIES[t.r];
@@ -1090,27 +878,16 @@ function spinReel(){
   document.getElementById('spin-btn').disabled=true;
   document.getElementById('reel-result').innerHTML='';
   var crate=document.getElementById('crate-visual');
-  crate.classList.add('shake');
-  setTimeout(function(){crate.classList.remove('shake');},500);
-
+  crate.classList.add('shake');setTimeout(function(){crate.classList.remove('shake');},500);
   var winner=pickTitle();
   var track=document.getElementById('reel-track');track.innerHTML='';
   var N=50;
-  for(var i=0;i<N-1;i++){
-    var t2=TITLES_DATA[Math.floor(Math.random()*TITLES_DATA.length)];
-    appendReelCard(track,t2);
-  }
+  for(var i=0;i<N-1;i++){appendReelCard(track,TITLES_DATA[Math.floor(Math.random()*TITLES_DATA.length)]);}
   appendReelCard(track,winner);
-
   var outer=document.getElementById('reel-outer');
-  var outerW=outer.offsetWidth||340;
-  var cardW=80;
-  var centerX=outerW/2-cardW/2;
-  var finalTx=centerX-(N-1)*cardW;
-
-  track.style.transition='none';
-  track.style.transform='translateX('+outerW+'px)';
-
+  var outerW=outer.offsetWidth||340;var cardW=80;
+  var centerX=outerW/2-cardW/2;var finalTx=centerX-(N-1)*cardW;
+  track.style.transition='none';track.style.transform='translateX('+outerW+'px)';
   requestAnimationFrame(function(){requestAnimationFrame(function(){
     var dur=3400+Math.random()*700;
     track.style.transition='transform '+dur+'ms cubic-bezier(0.12,0,0.08,1)';
@@ -1166,32 +943,28 @@ function renderSpinTab(){
     var pill=document.createElement('div');pill.className='title-pill'+(state.equippedTitle===name?' equipped':'');
     pill.style.cssText='background:'+rar.bg+';color:'+rar.color+';border-color:'+(state.equippedTitle===name?rar.color+'88':'transparent')+';';
     pill.textContent=t.i+' '+t.n;
-    pill.onclick=function(){state.equippedTitle=state.equippedTitle===name?null:name;renderSpinTab();updateHeaderBadge();saveUser();loadLB();};
+    pill.onclick=function(){state.equippedTitle=state.equippedTitle===name?null:name;renderSpinTab();updateHeaderBadge();saveUser();};
     g.appendChild(pill);
   });
 }
 
 // ============================================================
-// COSMETICS SHOP
+// COSMETICS
 // ============================================================
-var currentCosmCat='hair';
+var currentCosmCat='skin';
 function renderCosmetics(){
   var tabsEl=document.getElementById('cosm-cat-tabs');
-  // rebuild tabs if empty
-  if(tabsEl&&tabsEl.children.length===0){
+  if(tabsEl){
+    tabsEl.innerHTML='';
     COSM_CATS.forEach(function(cat){
       var b=document.createElement('button');b.className='cosm-tab'+(cat.id===currentCosmCat?' active':'');
       b.textContent=cat.label;
       b.onclick=function(){currentCosmCat=cat.id;renderCosmetics();};
       tabsEl.appendChild(b);
     });
-  }else if(tabsEl){
-    tabsEl.querySelectorAll('.cosm-tab').forEach(function(b,i){b.classList.toggle('active',COSM_CATS[i]&&COSM_CATS[i].id===currentCosmCat);});
   }
-
   var grid=document.getElementById('cosm-grid');if(!grid)return;grid.innerHTML='';
 
-  // Skin/hair tab is free
   if(currentCosmCat==='skin'){
     var sg=document.createElement('div');sg.className='skin-grid';
     SKIN_COLORS.forEach(function(s){
@@ -1219,14 +992,10 @@ function renderCosmetics(){
     var isOwned=!!state.ownedCosmetics[item.id];
     var isEq=state.equipped[item.cat]===item.id;
     var canAfford=state.count>=item.price;
-
     var div=document.createElement('div');
     div.className='cosm-item cosm-r-'+rar.id+(isEq?' equipped':'')+(isOwned?' owned':' locked');
-
-    // rarity shimmer overlay (additional highlight for high rarities)
     var shimmer='';
-    if(item.rarity>=3){shimmer='<div style="position:absolute;inset:0;border-radius:10px;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,'+rar.color+'18,transparent 70%);"></div>';}
-
+    if(item.rarity>=3)shimmer='<div style="position:absolute;inset:0;border-radius:10px;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,'+rar.color+'18,transparent 70%);"></div>';
     var priceOrOwned='';
     if(isOwned){
       priceOrOwned='<span class="cosm-owned-tag">✓ owned'+(isEq?' · equipped':'')+'</span>';
@@ -1234,25 +1003,16 @@ function renderCosmetics(){
       var col=canAfford?rar.color:'#ff6b6b';
       priceOrOwned='<span class="cosm-price" style="color:'+col+'">⭐ '+fmt(item.price)+'</span>';
     }
-
-    div.innerHTML=shimmer+
-      '<span class="cosm-icon">'+item.icon+'</span>'+
-      '<span class="cosm-name">'+item.name+'</span>'+
-      '<span class="cosm-rarity-tag" style="color:'+rar.color+'">'+rar.label+'</span>'+
-      priceOrOwned;
-
+    div.innerHTML=shimmer+'<span class="cosm-icon">'+item.icon+'</span><span class="cosm-name">'+item.name+'</span><span class="cosm-rarity-tag" style="color:'+rar.color+'">'+rar.label+'</span>'+priceOrOwned;
     div.onclick=function(){
       if(isOwned){
-        // equip/unequip
         if(isEq){delete state.equipped[item.cat];}else{state.equipped[item.cat]=item.id;}
         renderCosmetics();renderAvatarPreview();
-        var pc=document.getElementById('prof-cosm');if(pc)pc.textContent=Object.keys(state.equipped).length;
+        var pc=document.getElementById('prof-cosm');if(pc)pc.textContent=Object.keys(state.ownedCosmetics).length;
         saveUser();
       }else{
-        // try to buy
         if(state.count<item.price){showToast('not enough stars! need ⭐'+fmt(item.price));return;}
-        state.count-=item.price;
-        state.ownedCosmetics[item.id]=true;
+        state.count-=item.price;state.ownedCosmetics[item.id]=true;
         updateStats();renderCosmetics();renderAvatarPreview();saveUser();
         showToast(rar.label+' '+item.name+' unlocked! '+item.icon);
       }
@@ -1268,11 +1028,6 @@ function showToast(msg){
   setTimeout(function(){t.style.opacity='0';t.style.transition='opacity 0.4s';setTimeout(function(){t.remove();},400);},2000);
 }
 
-// inject skin/hair tab
-(function(){
-  var existing=COSM_CATS.find(function(c){return c.id==='skin';});
-  if(!existing)COSM_CATS.unshift({id:'skin',label:'🎨 skin'});
-})();
 // ============================================================
 // PROFILE
 // ============================================================
@@ -1294,36 +1049,29 @@ function renderProfile(){
 }
 
 // ============================================================
-// LEADERBOARD
+// LEADERBOARD (Supabase)
 // ============================================================
-async function saveToSharedLB(){
-  if(!window.storage)return;
-  try{
-    await window.storage.set('lb:'+state.username,JSON.stringify({
-      name:state.username,score:Math.floor(state.count),
-      title:state.equippedTitle,skinColor:state.skinColor,
-    }),true);
-  }catch(e){}
+var _lbDebounce=null;
+
+async function saveToSupabaseLB(){
+  if(!state.loggedIn||state.count<50)return;
+  await submitScore(state.username,state.count);
 }
 
 async function loadLB(){
-  if(!window.storage){renderLBLocal();return;}
-  try{
-    var result=await window.storage.list('lb:',true);var entries=[];
-    if(result&&result.keys){
-      for(var i=0;i<result.keys.length;i++){
-        try{var r=await window.storage.get(result.keys[i],true);if(r)entries.push(JSON.parse(r.value));}catch(e){}
-      }
-    }
-    if(!entries.find(function(e){return e.name===state.username;})){
-      entries.push({name:state.username,score:Math.floor(state.count),title:state.equippedTitle});
-    }
-    renderLBData(entries);
-  }catch(e){renderLBLocal();}
-}
-
-function renderLBLocal(){
-  renderLBData([{name:state.username,score:Math.floor(state.count),title:state.equippedTitle}]);
+  var body=document.getElementById('lb-body');
+  if(!body)return;
+  body.innerHTML='<div class="lb-loading">loading leaderboard…</div>';
+  // Always include current user (optimistic)
+  var entries=await getLeaderboard();
+  // Merge in current user if not present or score is higher
+  var found=entries.find(function(e){return e.name===state.username;});
+  if(!found){
+    entries.push({name:state.username,score:Math.floor(state.count),title:state.equippedTitle});
+  }else if(Math.floor(state.count)>found.score){
+    found.score=Math.floor(state.count);found.title=state.equippedTitle;
+  }
+  renderLBData(entries);
 }
 
 function renderLBData(entries){
@@ -1357,29 +1105,32 @@ for(var i=0;i<40;i++){
 // ============================================================
 // INTERVALS
 // ============================================================
+setInterval(function(){if(state.cps>0&&state.loggedIn){state.count+=state.cps;updateStats();}},1000);
+// Save locally every 5s, push to Supabase every 15s
+setInterval(function(){if(state.loggedIn){saveUser();}},5000);
+setInterval(function(){if(state.loggedIn){saveToSupabaseLB();}},15000);
+// Refresh LB every 30s while on LB tab
 setInterval(function(){
-  if(state.cps>0&&state.loggedIn){state.count+=state.cps;updateStats();}
-},1000);
-setInterval(function(){if(state.loggedIn){saveUser();saveToSharedLB();}},6000);
-setInterval(function(){if(state.loggedIn)loadLB();},10000);
+  if(state.loggedIn&&document.getElementById('panel-lb')&&document.getElementById('panel-lb').classList.contains('active')){
+    loadLB();
+  }
+},30000);
 
 // ============================================================
-// EVENT LISTENERS
+// EVENTS
 // ============================================================
 document.getElementById('star-btn').addEventListener('click',doClick);
-document.getElementById('star-btn').addEventListener('touchend',function(e){e.preventDefault();doClick(e.changedTouches?e.changedTouches[0]:e);});
-document.querySelectorAll('.form-input').forEach(function(inp){
-  inp.addEventListener('keydown',function(e){if(e.key==='Enter'){var btn=inp.closest('.auth-box,#setup-screen').querySelector('.form-btn,.form-btn');if(btn)btn.click();}});
+document.getElementById('star-btn').addEventListener('touchend',function(e){
+  e.preventDefault();doClick(e.changedTouches?e.changedTouches[0]:e);
 });
-
-// auto-login if stored
-(function(){
-  var last=localStorage.getItem('sc_last_user');
-  if(last&&userExists(last)){
-    // just show auth for security
-  }
-})();
-
+document.querySelectorAll('.form-input').forEach(function(inp){
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      var box=inp.closest('.auth-box');
+      if(box){var btn=box.querySelector('.form-btn');if(btn)btn.click();}
+    }
+  });
+});
 </script>
 </body>
 </html>
