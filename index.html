@@ -267,6 +267,38 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
 #app{position:relative;z-index:1;}
 .logout-btn{font-size:11px;color:var(--text4);background:transparent;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;}
 .logout-btn:hover{color:var(--text3);}
+/* DAILY REWARD */
+.daily-banner{margin:0.5rem 1rem;background:linear-gradient(135deg,#1a1200,#2a1800);border:1px solid var(--gold);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.daily-banner-text{font-size:13px;color:var(--gold);}
+.daily-btn{padding:7px 14px;font-size:12px;font-weight:500;border-radius:8px;border:none;background:var(--gold);color:#0f0f00;cursor:pointer;font-family:inherit;transition:opacity 0.15s;}
+.daily-btn:disabled{opacity:0.4;cursor:default;}
+#panel-achieve{display:none;padding:0.75rem 0 2rem;}
+#panel-achieve.active{display:block;animation:fadeIn 0.25s ease;}
+.achieve-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 1rem;}
+.achieve-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:10px;position:relative;overflow:hidden;}
+.achieve-card.done{border-color:#5DCAA566;background:#04201a;}
+.achieve-icon{font-size:22px;margin-bottom:4px;}
+.achieve-name{font-size:11px;font-weight:500;color:var(--text2);}
+.achieve-desc{font-size:10px;color:var(--text4);margin-top:2px;}
+.achieve-reward{font-size:10px;color:var(--gold);margin-top:3px;}
+.achieve-prog{height:3px;background:var(--bg4);border-radius:99px;margin-top:6px;overflow:hidden;}
+.achieve-prog-fill{height:100%;background:var(--accent2);border-radius:99px;transition:width 0.4s;}
+.achieve-done-stamp{position:absolute;top:6px;right:8px;font-size:10px;color:#5DCAA5;}
+.prestige-card{margin:0 1rem 1rem;background:linear-gradient(135deg,#0a0020,#1a0030);border:1px solid #9B59B6;border-radius:12px;padding:14px;}
+.prestige-title{font-size:14px;font-weight:500;color:#cc88ff;margin-bottom:4px;}
+.prestige-desc{font-size:11px;color:var(--text4);margin-bottom:10px;}
+.prestige-btn{padding:8px 18px;font-size:12px;font-weight:500;border-radius:8px;border:none;background:linear-gradient(135deg,#9B59B6,#6C3483);color:#fff;cursor:pointer;font-family:inherit;transition:opacity 0.15s;}
+.prestige-btn:disabled{opacity:0.35;cursor:default;}
+.prestige-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#1a0030;border:1px solid #9B59B6;color:#cc88ff;margin-left:6px;vertical-align:middle;}
+.ad-slot{margin:0.5rem 1rem;background:var(--bg3);border:0.5px dashed var(--border2);border-radius:8px;min-height:60px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text4);text-align:center;}
+@keyframes avatarFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.avatar-animated{animation:avatarFloat 3s ease-in-out infinite;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:340px;width:90%;text-align:center;}
+.modal-title{font-size:22px;font-weight:500;color:var(--gold);margin-bottom:8px;}
+.modal-body{font-size:13px;color:var(--text3);margin-bottom:16px;line-height:1.5;}
+.modal-btn{padding:10px 24px;font-size:13px;font-weight:500;border-radius:8px;border:none;background:var(--gold);color:#0f0f00;cursor:pointer;font-family:inherit;}
+
 </style>
 </head>
 <body>
@@ -330,6 +362,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
     <button class="tab-btn" onclick="switchTab('cosm')" id="tab-cosm">👗 dress</button>
     <button class="tab-btn" onclick="switchTab('profile')" id="tab-profile">👤 profile</button>
     <button class="tab-btn" onclick="switchTab('lb')" id="tab-lb">🏆 board</button>
+    <button class="tab-btn" onclick="switchTab('achieve')" id="tab-achieve">🎖️ goals</button>
   </div>
   <div class="tab-panel active" id="panel-game">
     <div style="text-align:center;padding:0.6rem 1rem 0.3rem;display:flex;align-items:center;justify-content:space-between;">
@@ -347,6 +380,9 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
     <div id="cps-bar"></div>
     <div id="star-wrap"><button id="star-btn" aria-label="Click the star">⭐</button></div>
     <div id="spins-avail"></div>
+    <div id="daily-banner-wrap"></div>
+    <!-- AD SLOT -->
+    <div class="ad-slot" id="ad-top">📢 advertisement — <a href="https://adsense.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">add Google AdSense here</a></div>
     <div class="section-label">upgrades</div>
     <div id="upg-grid"></div>
   </div>
@@ -398,7 +434,27 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min
       <div class="lb-card"><div class="lb-hdr"><span>commander</span><span>stars</span></div><div id="lb-body"></div></div>
     </div>
   </div>
+  <div class="tab-panel" id="panel-achieve">
+    <div class="section-label" style="margin-top:0.5rem;">achievements</div>
+    <div class="achieve-grid" id="achieve-grid"></div>
+    <div class="section-label" style="margin-top:1rem;">prestige</div>
+    <div class="prestige-card">
+      <div class="prestige-title">⚛️ prestige <span id="prestige-badge-display"></span></div>
+      <div class="prestige-desc" id="prestige-desc">reset your progress and earn a prestige badge — your cosmetics and titles stay!</div>
+      <button class="prestige-btn" id="prestige-btn" onclick="doPrestige()">prestige now</button>
+    </div>
+    <!-- AD SLOT BOTTOM -->
+    <div class="ad-slot" style="margin-top:0.5rem;">📢 advertisement — <a href="https://adsense.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">add Google AdSense here</a></div>
+  </div>
 </div>
+</div>
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">🎉</div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="modal-btn" onclick="closeModal()">awesome!</button>
+  </div>
 </div>
 <script>
 var SKIN_COLORS=[
@@ -654,12 +710,13 @@ var state={
   equipped:{},ownedCosmetics:{},
   upgrades:JSON.parse(JSON.stringify(UPGRADES)),
   currentCosmCat:'hair',reelSpinning:false,
+  achievements:{},totalClicks:0,totalEarned:0,dailyStreak:0,lastDaily:'',dailysClaimed:0,prestigeCount:0,totalSpins:0,
 };
 var SPIN_EVERY=500;
 function storageKey(user){return 'sc_user_'+user;}
 function saveUser(){
   if(!state.loggedIn)return;
-  var data={count:Math.floor(state.count),perClick:state.perClick,cps:state.cps,spinsAvailable:state.spinsAvailable,clicksSinceLastSpin:state.clicksSinceLastSpin,equippedTitle:state.equippedTitle,ownedTitles:state.ownedTitles,gender:state.gender,skinColor:state.skinColor,hairColor:state.hairColor,equipped:state.equipped,ownedCosmetics:state.ownedCosmetics,upgrades:state.upgrades,isNew:false};
+  var data={count:Math.floor(state.count),perClick:state.perClick,cps:state.cps,spinsAvailable:state.spinsAvailable,clicksSinceLastSpin:state.clicksSinceLastSpin,equippedTitle:state.equippedTitle,ownedTitles:state.ownedTitles,gender:state.gender,skinColor:state.skinColor,hairColor:state.hairColor,equipped:state.equipped,ownedCosmetics:state.ownedCosmetics,upgrades:state.upgrades,isNew:false,achievements:state.achievements,totalClicks:state.totalClicks,totalEarned:state.totalEarned,dailyStreak:state.dailyStreak,lastDaily:state.lastDaily,dailysClaimed:state.dailysClaimed,prestigeCount:state.prestigeCount,totalSpins:state.totalSpins};
   localStorage.setItem(storageKey(state.username),JSON.stringify(data));
 }
 function loadUser(username){var raw=localStorage.getItem(storageKey(username));if(!raw)return null;try{return JSON.parse(raw);}catch(e){return null;}}
@@ -689,6 +746,9 @@ function doLogin(){
     state.hairColor=data.hairColor||'#1a0800';state.equipped=data.equipped||{};
     state.ownedCosmetics=data.ownedCosmetics||{};
     state.upgrades=data.upgrades||JSON.parse(JSON.stringify(UPGRADES));
+    state.achievements=data.achievements||{};state.totalClicks=data.totalClicks||0;state.totalEarned=data.totalEarned||0;
+    state.dailyStreak=data.dailyStreak||0;state.lastDaily=data.lastDaily||'';state.dailysClaimed=data.dailysClaimed||0;
+    state.prestigeCount=data.prestigeCount||0;state.totalSpins=data.totalSpins||0;
     if(data.isNew){showSetup();}else{enterMain();}
   }else{showSetup();}
 }
@@ -736,14 +796,16 @@ function enterMain(){
   updateStats();renderUpgrades();updateHeaderBadge();
   buildReelInitial();renderSpinTab();renderCosmetics();renderProfile();
   switchTab('game');
+  checkDailyReward();updatePrestigeUI();renderAchievements();
 }
 function switchTab(t){
-  ['game','spin','cosm','profile','lb'].forEach(function(id){
+  ['game','spin','cosm','profile','lb','achieve'].forEach(function(id){
     var btn=document.getElementById('tab-'+id);var panel=document.getElementById('panel-'+id);
     if(!btn||!panel)return;
     btn.classList.toggle('active',id===t);panel.classList.toggle('active',id===t);
   });
   if(t==='profile')renderProfile();
+  if(t==='achieve'){renderAchievements();updatePrestigeUI();}
   if(t==='lb')loadLB();
   if(t==='cosm'){renderAvatarPreview();renderCosmetics();}
 }
@@ -847,7 +909,7 @@ function showPop(cx,cy){
   setTimeout(function(){pop.remove();},780);
 }
 function doClick(e){
-  state.count+=state.perClick;state.clicksSinceLastSpin++;
+  state.count+=state.perClick;state.clicksSinceLastSpin++;state.totalClicks++;state.totalEarned+=state.perClick;
   if(state.clicksSinceLastSpin>=SPIN_EVERY){state.clicksSinceLastSpin=0;state.spinsAvailable++;}
   updateStats();renderUpgrades();saveUser();
   var x=e.clientX||0,y=e.clientY||0;
@@ -866,7 +928,7 @@ function buildReelInitial(){
 }
 function spinReel(){
   if(state.spinsAvailable<=0||state.reelSpinning)return;
-  state.spinsAvailable--;state.reelSpinning=true;
+  state.spinsAvailable--;state.reelSpinning=true;state.totalSpins++;
   document.getElementById('spin-btn').disabled=true;
   document.getElementById('reel-result').innerHTML='';
   var crate=document.getElementById('crate-visual');crate.classList.add('shake');
@@ -954,7 +1016,7 @@ function renderCosmetics(){
 function showToast(msg){var t=document.createElement('div');t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1245;border:0.5px solid #534AB7;color:#e8e0ff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;white-space:nowrap;pointer-events:none;animation:fadeIn 0.2s ease;';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';t.style.transition='opacity 0.4s';setTimeout(function(){t.remove();},400);},2000);}
 (function(){var existing=COSM_CATS.find(function(c){return c.id==='skin';});if(!existing)COSM_CATS.unshift({id:'skin',label:'🎨 skin'});})();
 function renderProfile(){
-  var large=document.getElementById('avatar-display-large');if(large)large.innerHTML=buildAvatarSVG(130);
+  var large=document.getElementById('avatar-display-large');if(large)large.innerHTML='<div class="avatar-animated">'+buildAvatarSVG(130)+'</div>';
   var nd=document.getElementById('profile-name-display');if(nd)nd.textContent=state.username;
   var td=document.getElementById('profile-title-display');
   if(td){if(state.equippedTitle){var t=TITLES_DATA.find(function(x){return x.n===state.equippedTitle;});if(t){var r=RARITIES[t.r];td.innerHTML='<span class="title-badge" style="background:'+r.bg+';color:'+r.color+';font-size:13px;padding:4px 12px;">'+t.i+' '+t.n+'</span>';}}else{td.innerHTML='<span style="font-size:12px;color:var(--text4)">no title equipped</span>';}}
@@ -985,10 +1047,25 @@ function renderLBData(entries){
     return '<div class="lb-row'+(isYou?' lb-you':'')+'"><span class="lb-rank">'+(i<3?medals[i]:(i+1))+'</span><span class="lb-name">'+badge+e.name+(isYou?' <span style="font-size:10px;color:var(--accent2)">(you)</span>':'')+'</span><span class="lb-score">⭐'+fmt(e.score)+'</span></div>';
   }).join('');
 }
+
+function claimDaily(){
+  var today=new Date().toDateString();
+  var yesterday=new Date(Date.now()-86400000).toDateString();
+  if(state.lastDaily===today)return;
+  if(state.lastDaily===yesterday){state.dailyStreak=(state.dailyStreak||0)+1;}
+  else{state.dailyStreak=0;}
+  state.lastDaily=today;
+  state.dailysClaimed=(state.dailysClaimed||0)+1;
+  var DAILY_REWARDS=[500,1000,1500,2000,2500,3000,5000];
+  var reward=DAILY_REWARDS[Math.min(state.dailyStreak,6)];
+  state.count+=reward;state.totalEarned+=reward;
+  updateStats();checkAchievements();saveUser();checkDailyReward();
+  showModal('🎁 Daily Reward!','Day '+(Math.min(state.dailyStreak,6)+1)+' streak!<br><br>⭐ +'+fmt(reward)+' stars added!');
+}
 var bgC=document.getElementById('bg-stars-container');
 for(var i=0;i<40;i++){var s=document.createElement('div');s.className='bg-star';var sz=0.8+Math.random()*2;s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%;--d:'+(1.5+Math.random()*3.5)+'s;animation-delay:'+(Math.random()*4)+'s;';bgC.appendChild(s);}
-setInterval(function(){if(state.cps>0&&state.loggedIn){state.count+=state.cps;updateStats();}},1000);
-setInterval(function(){if(state.loggedIn){saveUser();saveToSharedLB();}},6000);
+setInterval(function(){if(state.cps>0&&state.loggedIn){state.count+=state.cps;state.totalEarned+=state.cps;updateStats();checkAchievements();}},1000);
+setInterval(function(){if(state.loggedIn){saveUser();saveToSharedLB();checkAchievements();}},6000);
 setInterval(function(){if(state.loggedIn)loadLB();},10000);
 document.getElementById('star-btn').addEventListener('click',doClick);
 document.getElementById('star-btn').addEventListener('touchend',function(e){e.preventDefault();doClick(e.changedTouches?e.changedTouches[0]:e);});
