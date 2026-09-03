@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Star Clicker: Celestial Edition</title>
+  <title>Star Clicker - Celestial Edition</title>
   <style>
     :root {
-      --bg: #0b0d19;
-      --card-bg: #161b33;
+      --bg: #090b15;
+      --panel-bg: #111528;
+      --card-bg: #1a203c;
+      --border: #2a3459;
       --accent: #6366f1;
       --gold: #f59e0b;
       --dust: #a855f7;
@@ -18,47 +20,47 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
     
-    .game-container { width: 100%; max-width: 500px; background: #111428; border-radius: 16px; border: 1px solid #2d3748; padding: 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .game-container { width: 100%; max-width: 520px; background: var(--panel-bg); border-radius: 16px; border: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
 
-    .header { text-align: center; background: var(--card-bg); padding: 15px; border-radius: 12px; }
-    .currency-display { font-size: 1.8rem; font-weight: bold; color: var(--gold); }
-    .sub-currency { font-size: 0.9rem; color: var(--dust); margin-top: 4px; }
+    .header { text-align: center; background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border); }
+    .currency-display { font-size: 2rem; font-weight: 800; color: var(--gold); }
+    .sub-currency { font-size: 0.95rem; color: var(--dust); margin-top: 4px; font-weight: 600; }
 
-    .nav-tabs { display: flex; gap: 8px; background: var(--card-bg); padding: 6px; border-radius: 10px; }
-    .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+    .nav-tabs { display: flex; gap: 6px; background: var(--card-bg); padding: 6px; border-radius: 10px; border: 1px solid var(--border); }
+    .tab-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.2s; text-align: center; }
     .tab-btn.active { background: var(--accent); color: white; }
 
     .panel { display: none; flex-direction: column; gap: 12px; }
     .panel.active { display: flex; }
 
     /* Clicker Area */
-    .click-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; position: relative; user-select: none; }
-    .star-btn { font-size: 6rem; cursor: pointer; transition: transform 0.1s ease; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3)); }
-    .star-btn:active { transform: scale(0.9); }
-    .stats-row { display: flex; justify-content: space-between; width: 100%; font-size: 0.85rem; color: var(--text-muted); }
+    .click-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px; position: relative; user-select: none; }
+    .star-btn { font-size: 6rem; cursor: pointer; transition: transform 0.08s ease, filter 0.2s ease; filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4)); }
+    .star-btn:active { transform: scale(0.88); }
+    .stats-row { display: flex; justify-content: space-between; width: 100%; font-size: 0.85rem; color: var(--text-muted); background: var(--card-bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); }
 
-    /* Upgrades & Shop */
-    .upgrade-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
-    .upgrade-card, .cosm-item { background: var(--card-bg); border: 1px solid #2d3748; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .upgrade-card:hover, .cosm-item:hover { border-color: var(--accent); }
+    /* Lists & Cards */
+    .upgrade-list, .crate-list, .profile-stats { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+    .upgrade-card, .crate-card { background: var(--card-bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
 
     /* Wardrobe Grid */
-    .cosm-cat-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
-    .cosm-tab { flex: 1; padding: 6px; font-size: 0.75rem; background: var(--card-bg); border: 1px solid #2d3748; color: var(--text); border-radius: 6px; cursor: pointer; }
-    .cosm-tab.active { border-color: var(--gold); background: #22294a; }
-    .cosm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: 300px; overflow-y: auto; }
-    .cosm-item { flex-direction: column; text-align: center; gap: 6px; position: relative; }
-    .cosm-item.equipped { border-color: #4ade80; background: #132a20; }
-    .cosm-icon { font-size: 2rem; }
+    .cosm-cat-tabs { display: flex; gap: 6px; }
+    .cosm-tab { flex: 1; padding: 8px; font-size: 0.75rem; background: var(--card-bg); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .cosm-tab.active { border-color: var(--accent); background: var(--accent); }
+    .cosm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: 280px; overflow-y: auto; }
+    .cosm-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+    .cosm-item:hover { border-color: var(--accent); }
+    .cosm-item.equipped { border-color: #4ade80; background: #12281e; }
+    .cosm-icon { font-size: 2.2rem; }
 
     /* Celestial Tab */
-    .celestial-card { background: #1a102f; border: 1px solid var(--dust); padding: 16px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; gap: 10px; }
-    .btn-ascend { background: var(--dust); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .btn-ascend:hover { opacity: 0.9; }
+    .celestial-card { background: #1d1536; border: 1px solid var(--dust); padding: 18px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; gap: 12px; }
+    .btn-action { background: var(--accent); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-ascend { background: var(--dust); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
 
-    /* Floating Click Text Animation */
-    .click-text { position: absolute; color: var(--gold); font-weight: bold; pointer-events: none; animation: floatUp 0.8s ease-out forwards; }
-    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
+    /* Click Animation */
+    .click-text { position: absolute; color: var(--gold); font-weight: bold; pointer-events: none; animation: floatUp 0.7s ease-out forwards; font-size: 1.2rem; }
+    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-35px); } }
   </style>
 </head>
 <body>
@@ -69,35 +71,68 @@
     <div class="sub-currency">⚛️ Celestial Dust: <span id="dust-count">0</span></div>
   </div>
 
+  <!-- ALL 5 ORIGINAL TABS -->
   <div class="nav-tabs">
-    <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">Game</button>
+    <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">Clicker</button>
+    <button class="tab-btn" id="tab-crates" onclick="switchTab('crates')">Crates</button>
     <button class="tab-btn" id="tab-cosm" onclick="switchTab('cosm')">Wardrobe</button>
+    <button class="tab-btn" id="tab-profile" onclick="switchTab('profile')">Profile</button>
     <button class="tab-btn" id="tab-prestige" onclick="switchTab('prestige')">Celestial</button>
   </div>
 
-  <!-- GAME PANEL -->
+  <!-- 1. CLICKER PANEL -->
   <div class="panel active" id="panel-game">
-    <div class="click-zone" id="click-zone">
+    <div class="click-zone">
       <div class="star-btn" id="main-star" onclick="clickStar(event)">⭐</div>
     </div>
     <div class="stats-row">
-      <span>Per Click: <strong id="click-power">1</strong></span>
-      <span>Per Second: <strong id="cps-val">0</strong></span>
+      <span>Per Click: <strong id="click-power" style="color:var(--gold)">1</strong></span>
+      <span>Per Second: <strong id="cps-val" style="color:var(--gold)">0</strong></span>
     </div>
     <div class="upgrade-list" id="upgrade-list"></div>
   </div>
 
-  <!-- WARDROBE PANEL -->
+  <!-- 2. CRATES PANEL -->
+  <div class="panel" id="panel-crates">
+    <div class="crate-list">
+      <div class="crate-card">
+        <div>
+          <strong>📦 Standard Crate</strong>
+          <div style="font-size:0.75rem; color:var(--text-muted)">Contains random star boosts or common hats.</div>
+        </div>
+        <button class="btn-action" onclick="openCrate('standard')">⭐ 1.0K</button>
+      </div>
+      <div class="crate-card">
+        <div>
+          <strong>👑 Royal Crate</strong>
+          <div style="font-size:0.75rem; color:var(--text-muted)">Unlocks rare cosmetic skins & massive star packs.</div>
+        </div>
+        <button class="btn-action" onclick="openCrate('royal')">⭐ 50.0K</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. UPGRADED WARDROBE PANEL -->
   <div class="panel" id="panel-cosm">
     <div class="cosm-cat-tabs" id="cosm-cat-tabs"></div>
     <div class="cosm-grid" id="cosm-grid"></div>
   </div>
 
-  <!-- CELESTIAL PANEL -->
+  <!-- 4. PROFILE PANEL -->
+  <div class="panel" id="panel-profile">
+    <div class="profile-stats">
+      <div class="upgrade-card"><span>Total Stars Earned</span><strong id="prof-earned">0</strong></div>
+      <div class="upgrade-card"><span>Total Manual Clicks</span><strong id="prof-clicks">0</strong></div>
+      <div class="upgrade-card"><span>Cosmetics Unlocked</span><strong id="prof-unlocked">0</strong></div>
+      <div class="upgrade-card"><span>Current Title</span><strong id="prof-title" style="color:var(--dust)">Novice Stargazer</strong></div>
+    </div>
+  </div>
+
+  <!-- 5. CELESTIAL PANEL -->
   <div class="panel" id="panel-prestige">
     <div class="celestial-card">
       <h3>✨ Celestial Ascension</h3>
-      <p style="font-size: 0.85rem; color: var(--text-muted);">Reset your stars and base upgrades to gain Celestial Dust. Dust provides permanent power boosts!</p>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Reset your stars and base click upgrades to gain Celestial Dust. Dust grants permanent multiplicative boosts!</p>
       <div>Pending Dust: <strong id="pending-dust" style="color: var(--dust)">0</strong></div>
       <button class="btn-ascend" onclick="ascend()">Ascend Now</button>
     </div>
@@ -109,6 +144,7 @@
 let state = {
   count: 0,
   totalEarned: 0,
+  clicksCount: 0,
   dust: 0,
   baseClickPower: 1,
   baseCPS: 0,
@@ -122,7 +158,7 @@ let state = {
   }
 };
 
-// --- COSMETICS DATA (Hats, Skins, Auras, Skin Tones + Effects) ---
+// --- COSMETICS DATA (With Stat Effects & Custom Skin Tones) ---
 const COSMETICS_DATA = [
   // HATS
   { id: 'hat_cap', name: 'Snapback Cap', cat: 'hats', icon: '🧢', price: 500, desc: '+5% Click Power', effect: { clickMult: 0.05 } },
@@ -159,7 +195,7 @@ function getCosmeticBonuses() {
 
 function getClickPower() {
   const cosmetics = getCosmeticBonuses();
-  const dustBonus = 1 + (state.dust * 0.10); // +10% per Dust
+  const dustBonus = 1 + (state.dust * 0.10);
   return state.baseClickPower * (1 + cosmetics.clickMult) * dustBonus;
 }
 
@@ -181,15 +217,15 @@ function clickStar(e) {
   const power = getClickPower();
   state.count += power;
   state.totalEarned += power;
+  state.clicksCount++;
 
-  // Floating indicator
   const el = document.createElement('div');
   el.className = 'click-text';
   el.textContent = '+' + fmt(power);
   el.style.left = (e.clientX - 15) + 'px';
   el.style.top = (e.clientY - 20) + 'px';
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 800);
+  setTimeout(() => el.remove(), 700);
 
   updateUI();
 }
@@ -203,6 +239,20 @@ function buyUpgrade(key) {
     if (up.cps) state.baseCPS += up.cps;
     up.cost = Math.floor(up.cost * 1.15);
     updateUI();
+  }
+}
+
+function openCrate(type) {
+  const cost = type === 'standard' ? 1000 : 50000;
+  if (state.count >= cost) {
+    state.count -= cost;
+    const reward = Math.floor(cost * (1.2 + Math.random()));
+    state.count += reward;
+    state.totalEarned += reward;
+    alert(`🎉 Opened ${type.toUpperCase()} Crate! You received ⭐ ${fmt(reward)} stars!`);
+    updateUI();
+  } else {
+    alert("Not enough stars to open this crate!");
   }
 }
 
@@ -223,7 +273,7 @@ function ascend() {
 
   updateUI();
   switchTab('game');
-  alert(`Ascended! You received +${pending} Celestial Dust.`);
+  alert(`✨ Ascended! Received +${pending} Celestial Dust.`);
 }
 
 // --- WARDROBE RENDER & LOGIC ---
@@ -296,17 +346,30 @@ function applyCosmeticVisuals() {
   if (toneItem && toneItem.color) {
     star.style.filter = `drop-shadow(0 0 20px ${toneItem.color})`;
   } else {
-    star.style.filter = 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.3))';
+    star.style.filter = 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.4))';
   }
 }
 
-// --- UI & CORE LOOP ---
+// --- UI & TABS ENGINE ---
 function switchTab(t) {
-  ['game','cosm','prestige'].forEach(id => {
+  ['game','crates','cosm','profile','prestige'].forEach(id => {
     document.getElementById('tab-' + id).classList.toggle('active', id === t);
     document.getElementById('panel-' + id).classList.toggle('active', id === t);
   });
   if (t === 'cosm') renderWardrobe();
+  if (t === 'profile') renderProfile();
+}
+
+function renderProfile() {
+  document.getElementById('prof-earned').textContent = fmt(state.totalEarned);
+  document.getElementById('prof-clicks').textContent = fmt(state.clicksCount);
+  document.getElementById('prof-unlocked').textContent = `${state.ownedCosmetics.length} / ${COSMETICS_DATA.length}`;
+  
+  let title = "Novice Stargazer";
+  if (state.totalEarned >= 1000000) title = "Galactic Master";
+  else if (state.totalEarned >= 100000) title = "Celestial Voyager";
+  else if (state.totalEarned >= 10000) title = "Star Collector";
+  document.getElementById('prof-title').textContent = title;
 }
 
 function renderUpgrades() {
@@ -328,9 +391,7 @@ function renderUpgrades() {
         <div><strong>${item.name}</strong> (${up.count})</div>
         <div style="font-size:0.75rem; color: var(--text-muted);">${item.desc}</div>
       </div>
-      <button style="padding:6px 12px; background:var(--accent); border:none; color:white; border-radius:6px; cursor:pointer;" onclick="buyUpgrade('${item.key}')">
-        ⭐ ${fmt(up.cost)}
-      </button>
+      <button class="btn-action" onclick="buyUpgrade('${item.key}')">⭐ ${fmt(up.cost)}</button>
     `;
     container.appendChild(card);
   });
@@ -351,7 +412,7 @@ function fmt(n) {
   return Math.floor(n).toLocaleString();
 }
 
-// Game loop (10 FPS tick)
+// Passive Loop (10 FPS)
 setInterval(() => {
   const gained = getCPS() / 10;
   state.count += gained;
