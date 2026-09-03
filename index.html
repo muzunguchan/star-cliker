@@ -1,766 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⭐ Star Clicker - Overdrive Edition</title>
-<style>
-:root{
-  --bg:#07071a;--bg2:#0d0d26;--bg3:#13132e;--bg4:#1a1a3a;
-  --border:#2a2a5a;--border2:#3a3a6a;
-  --text:#e8e0ff;--text2:#AFA9EC;--text3:#7a6fa8;--text4:#4a4470;
-  --accent:#7F77DD;--accent2:#534AB7;--gold:#ffd700;--frenzy:#ff3366;
-  --r-common:#888780;--r-uncommon:#5DCAA5;--r-rare:#378ADD;
-  --r-epic:#AFA9EC;--r-legendary:#ffd700;--r-mythic:#ff6fff;--r-secret:#fff;
+// ----------------------------------------------------
+// 1. COSMETICS DATASET (Hats, Skins, Auras, Skin Tones)
+// ----------------------------------------------------
+const COSMETICS_DATA = [
+  // HATS
+  { id: 'hat_cap', name: 'Snapback Cap', cat: 'hats', icon: '🧢', price: 500, desc: '+5% Click Power', effect: { clickMult: 0.05 } },
+  { id: 'hat_crown', name: 'Royal Crown', cat: 'hats', icon: '👑', price: 25000, desc: '+15% All Stars', effect: { cpsMult: 0.15 } },
+  { id: 'hat_halo', name: 'Angelic Halo', cat: 'hats', icon: '😇', price: 150000, desc: '+25% Celestial Dust', effect: { dustMult: 0.25 } },
+  { id: 'hat_wizard', name: 'Arcane Hat', cat: 'hats', icon: '🧙‍♂️', price: 750000, desc: '+30% Click Power', effect: { clickMult: 0.30 } },
+
+  // SKINS
+  { id: 'skin_alien', name: 'Zeta Alien', cat: 'skins', icon: '👽', price: 2500, desc: '+10% Passive Stars', effect: { cpsMult: 0.10 } },
+  { id: 'skin_robot', name: 'Cyber Android', cat: 'skins', icon: '🤖', price: 50000, desc: '+20% Click Power', effect: { clickMult: 0.20 } },
+  { id: 'skin_dragon', name: 'Draconic Form', cat: 'skins', icon: '🐉', price: 500000, desc: '+35% All Stars', effect: { cpsMult: 0.35 } },
+
+  // AURAS
+  { id: 'bg_space', name: 'Deep Space', cat: 'auras', icon: '🌌', price: 5000, desc: '+10% All Stars', effect: { cpsMult: 0.10 } },
+  { id: 'bg_fire', name: 'Inferno Aura', cat: 'auras', icon: '🔥', price: 75000, desc: '+25% Click Power', effect: { clickMult: 0.25 } },
+  { id: 'bg_supernova', name: 'Supernova Burst', cat: 'auras', icon: '💥', price: 1000000, desc: '+50% All Stars & +20% Dust', effect: { cpsMult: 0.50, dustMult: 0.20 } },
+
+  // SKIN TONES
+  { id: 'tone_gold', name: 'Midas Gold', cat: 'skintones', icon: '✨', price: 10000, desc: '+12% Click Power', color: '#ffd700', effect: { clickMult: 0.12 } },
+  { id: 'tone_neon', name: 'Neon Cyan', cat: 'skintones', icon: '🩵', price: 30000, desc: '+12% Passive Stars', color: '#00f3ff', effect: { cpsMult: 0.12 } },
+  { id: 'tone_void', name: 'Void Purple', cat: 'skintones', icon: '💜', price: 200000, desc: '+20% Click & +15% Dust', color: '#a855f7', effect: { clickMult: 0.20, dustMult: 0.15 } },
+  { id: 'tone_obsidian', name: 'Shadow Obsidian', cat: 'skintones', icon: '🖤', price: 2000000, desc: '+50% All Stars', color: '#1e1b4b', effect: { cpsMult: 0.50 } }
+];
+
+// ----------------------------------------------------
+// 2. STAT BONUSES CALCULATION ENGINE
+// ----------------------------------------------------
+function getCosmeticBonuses() {
+  const totals = { clickMult: 0, cpsMult: 0, dustMult: 0 };
+  if (!state.equippedCosmetics) return totals;
+
+  Object.values(state.equippedCosmetics).forEach(itemId => {
+    const item = COSMETICS_DATA.find(c => c.id === itemId);
+    if (item && item.effect) {
+      if (item.effect.clickMult) totals.clickMult += item.effect.clickMult;
+      if (item.effect.cpsMult) totals.cpsMult += item.effect.cpsMult;
+      if (item.effect.dustMult) totals.dustMult += item.effect.dustMult;
+    }
+  });
+
+  return totals;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:16px;overflow-x:hidden;}
-#app{width:100%;max-width:700px;position:relative;z-index:2;}
-canvas#fx-canvas{position:fixed;inset:0;pointer-events:none;z-index:1;}
 
-.screen{display:none;}
-.screen.active{display:block;}
-#auth-screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
-#auth-screen.active{display:flex;}
-.auth-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:360px;}
-.auth-tabs{display:flex;gap:8px;margin-bottom:1.2rem;}
-.auth-tab{flex:1;padding:8px;font-size:13px;border-radius:8px;border:0.5px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-family:inherit;}
-.auth-tab.active{background:var(--accent2);color:var(--text);border-color:var(--accent);}
-.form-group{margin-bottom:0.9rem;}
-.form-label{font-size:11px;color:var(--text3);margin-bottom:4px;display:block;text-transform:uppercase;}
-.form-input{width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:9px 12px;outline:none;}
-.form-btn{width:100%;padding:10px;font-size:14px;font-weight:500;border-radius:8px;border:1px solid var(--accent);background:var(--accent2);color:var(--text);cursor:pointer;}
-.form-err{font-size:12px;color:#ff6b6b;margin-top:6px;min-height:18px;}
+// ----------------------------------------------------
+// 3. WARDROBE RENDER & LOGIC
+// ----------------------------------------------------
+function renderWardrobe() {
+  if (!state.activeCosmCategory) state.activeCosmCategory = 'hats';
+  
+  // Update current stars display
+  const starCountEl = document.getElementById('shop-star-count');
+  if (starCountEl) starCountEl.textContent = fmt(state.count);
 
-#setup-screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
-#setup-screen.active{display:flex;}
-.setup-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:420px;text-align:center;}
-.gender-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
-.gender-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:1.5rem 1rem;cursor:pointer;}
-.gender-card.selected{border-color:var(--accent);background:var(--bg4);}
-
-.tab-bar{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
-.tab-btn{flex:1;padding:11px 4px;font-size:11px;font-weight:500;color:var(--text4);background:transparent;border:none;cursor:pointer;border-bottom:2px solid transparent;}
-.tab-btn.active{color:var(--text2);border-bottom-color:var(--accent);}
-.tab-panel{display:none;padding:0.75rem 0 2rem;}
-.tab-panel.active{display:block;}
-
-.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:0.6rem 1rem;}
-.stat-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:9px 8px;text-align:center;}
-.stat-label{font-size:11px;color:var(--text3);margin-bottom:3px;}
-.stat-val{font-size:18px;font-weight:500;color:var(--text);}
-
-/* COMBO & MULTIPLIER UI */
-#combo-container{margin:0.5rem 1rem;background:var(--bg3);border-radius:10px;padding:8px 12px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.combo-bar-wrap{flex:1;height:8px;background:var(--bg4);border-radius:99px;margin:0 12px;overflow:hidden;}
-.combo-bar-fill{height:100%;width:0%;background:linear-gradient(90deg, var(--accent), var(--gold));transition:width 0.1s linear;}
-#combo-mult{font-weight:bold;color:var(--gold);font-size:14px;min-width:45px;text-align:right;}
-
-/* STAR CLICKER JUICE */
-#star-wrap{position:relative;display:flex;justify-content:center;align-items:center;padding:1rem 0;min-height:170px;}
-#star-btn{border:none;background:transparent;cursor:pointer;font-size:120px;line-height:1;padding:0;display:block;transition:transform 0.05s ease;user-select:none;filter:drop-shadow(0 0 20px rgba(255,215,0,0.6));}
-#star-btn:active{transform:scale(0.82) rotate(-3deg);}
-#star-btn.crit-bounce{animation:critPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
-
-@keyframes critPop{0%{transform:scale(0.7);}50%{transform:scale(1.35) rotate(6deg);}100%{transform:scale(1);}}
-
-.star-pop{position:absolute;pointer-events:none;font-size:20px;font-weight:bold;color:var(--gold);animation:floatUp 0.8s ease-out forwards;white-space:nowrap;z-index:10;text-shadow:0 0 8px rgba(0,0,0,0.8);}
-.star-pop.crit{font-size:28px;color:#ff3366;text-shadow:0 0 12px #ff3366;}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-80px) scale(1.2);}}
-
-/* GOLDEN STAR RANDOM EVENT */
-.golden-star-event{position:fixed;font-size:45px;cursor:pointer;z-index:999;filter:drop-shadow(0 0 15px #ffd700);animation:goldenFloat 12s linear forwards, goldenPulse 0.6s ease-in-out infinite alternate;}
-@keyframes goldenFloat{0%{left:-60px;top:20%;}50%{top:70%;}100%{left:105vw;top:30%;}}
-@keyframes goldenPulse{from{transform:scale(1);}to{transform:scale(1.25);}}
-
-/* FRENZY OVERLAY BANNER */
-#frenzy-banner{display:none;margin:0.4rem 1rem;background:linear-gradient(90deg, #ff3366, #ff9900);border-radius:8px;padding:8px;text-align:center;color:#fff;font-weight:bold;font-size:13px;box-shadow:0 0 15px rgba(255,51,102,0.5);animation:pulse 0.5s infinite alternate;}
-@keyframes pulse{from{opacity:0.85;}to{opacity:1;}}
-
-.section-label{font-size:11px;font-weight:500;letter-spacing:0.08em;color:var(--text4);text-transform:uppercase;margin:0.8rem 1rem 0.4rem;}
-#upg-grid, .perk-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 1rem;}
-.upgrade-btn, .perk-btn{background:var(--bg3);border:0.5px solid var(--border);border-radius:10px;padding:8px 10px;cursor:pointer;text-align:left;color:var(--text);transition:all 0.1s;}
-.upgrade-btn:hover:not([disabled]), .perk-btn:hover:not([disabled]){background:var(--bg4);border-color:var(--accent);}
-.upgrade-btn[disabled], .perk-btn[disabled]{opacity:0.35;cursor:default;}
-.upg-name{font-size:12px;font-weight:500;}
-.upg-desc{font-size:11px;color:var(--text4);margin-top:1px;}
-.upg-cost{font-size:11px;color:var(--gold);margin-top:3px;font-weight:500;}
-
-#crate-area{text-align:center;padding:0.75rem 1rem 0.5rem;}
-#crate-visual{font-size:68px;cursor:pointer;display:inline-block;filter:drop-shadow(0 0 10px var(--accent2));}
-#crate-visual.shake{animation:crateShake 0.5s ease;}
-@keyframes crateShake{0%{transform:rotate(0);}15%{transform:rotate(-12deg) scale(1.15);}30%{transform:rotate(12deg) scale(1.15);}45%{transform:rotate(-8deg);}60%{transform:rotate(8deg);}100%{transform:rotate(0) scale(1);}}
-.big-spin-btn{display:block;margin:8px auto;padding:9px 28px;font-size:14px;font-weight:500;cursor:pointer;border-radius:10px;border:1.5px solid var(--accent);background:var(--bg4);color:var(--text2);}
-.big-spin-btn[disabled]{opacity:0.35;cursor:default;}
-
-#reel-outer{margin:0.5rem 1rem 0;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative;height:96px;}
-#reel-outer::before,#reel-outer::after{content:'';position:absolute;top:0;bottom:0;width:55px;z-index:3;pointer-events:none;}
-#reel-outer::before{left:0;background:linear-gradient(to right,var(--bg2),transparent);}
-#reel-outer::after{right:0;background:linear-gradient(to left,var(--bg2),transparent);}
-#reel-center-line{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:82px;border-left:1.5px solid #7F77DDaa;border-right:1.5px solid #7F77DDaa;z-index:2;pointer-events:none;}
-#reel-track{display:flex;align-items:center;gap:6px;padding:8px;will-change:transform;white-space:nowrap;height:96px;}
-.reel-card{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:74px;height:80px;border-radius:10px;border:1px solid #2a2a5a;padding:4px;flex-shrink:0;}
-.reel-card .rc-icon{font-size:22px;}
-.reel-card .rc-name{font-size:9px;font-weight:500;text-align:center;margin-top:2px;max-width:68px;}
-
-#reel-result{min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 1rem;text-align:center;}
-.title-badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:99px;font-weight:500;margin-right:4px;}
-
-#owned-titles-grid{display:flex;flex-wrap:wrap;gap:6px;margin:0 1rem 0.5rem;}
-.title-pill{padding:4px 11px;border-radius:99px;font-size:11px;font-weight:500;cursor:pointer;border:1.5px solid transparent;}
-.title-pill.equipped{border-color:rgba(255,255,255,0.4)!important;}
-
-.cosm-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0.75rem;}
-.cosm-tab{padding:6px 12px;border-radius:8px;font-size:12px;border:0.5px solid var(--border);background:var(--bg3);color:var(--text3);cursor:pointer;}
-.cosm-tab.active{background:var(--accent2);color:var(--text);border-color:var(--accent);}
-#cosm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;}
-.cosm-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 6px;cursor:pointer;text-align:center;position:relative;overflow:hidden;}
-.cosm-item.equipped{border-color:var(--gold)!important;background:#1a1200;}
-.cosm-icon{font-size:26px;margin-bottom:3px;display:block;}
-.cosm-name{font-size:10px;color:var(--text3);}
-.cosm-price{font-size:10px;font-weight:500;margin-top:3px;}
-
-.profile-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:14px;padding:1.25rem;margin:0 1rem 1rem;}
-.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
-.profile-stat{background:var(--bg3);border-radius:8px;padding:10px;text-align:center;}
-
-.prestige-card{margin:0 1rem 1rem;background:linear-gradient(135deg,#0a0020,#1a0030);border:1px solid #9B59B6;border-radius:12px;padding:14px;}
-.prestige-btn{padding:8px 18px;font-size:12px;font-weight:500;border-radius:8px;border:none;background:linear-gradient(135deg,#9B59B6,#6C3483);color:#fff;cursor:pointer;}
-.spin-bar-wrap{max-width:280px;margin:4px auto;}
-.spin-bar-bg{height:5px;background:var(--bg4);border-radius:99px;overflow:hidden;}
-.spin-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),#D4537E);border-radius:99px;}
-
-.logout-btn{font-size:11px;color:var(--text4);background:transparent;border:none;cursor:pointer;padding:4px 8px;}
-</style>
-</head>
-<body>
-<canvas id="fx-canvas"></canvas>
-<div id="app">
-
-<!-- AUTH SCREEN -->
-<div id="auth-screen" class="screen active">
-  <div style="font-size:42px;margin-bottom:8px;filter:drop-shadow(0 0 12px #ffd700aa)">⭐</div>
-  <div style="font-size:26px;font-weight:bold;margin-bottom:4px;color:var(--text)">Star Clicker</div>
-  <div style="font-size:12px;color:var(--text4);margin-bottom:1.5rem;">Overdrive Edition</div>
-  <div class="auth-box">
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="authTab('login')">Log In</button>
-      <button class="auth-tab" onclick="authTab('register')">Register</button>
-    </div>
-    <div id="login-form">
-      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="login-name" placeholder="Commander name..." maxlength="20"/></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="login-pass" placeholder="••••••••"/></div>
-      <button class="form-btn" onclick="doLogin()">Log In</button>
-      <div class="form-err" id="login-err"></div>
-    </div>
-    <div id="register-form" style="display:none">
-      <div class="form-group"><label class="form-label">Username</label><input class="form-input" id="reg-name" placeholder="Choose a name..." maxlength="20"/></div>
-      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="reg-pass" placeholder="Password..."/></div>
-      <div class="form-group"><label class="form-label">Confirm Password</label><input class="form-input" type="password" id="reg-pass2" placeholder="Repeat password..."/></div>
-      <button class="form-btn" onclick="doRegister()">Create Account</button>
-      <div class="form-err" id="reg-err"></div>
-    </div>
-  </div>
-</div>
-
-<!-- SETUP SCREEN -->
-<div id="setup-screen" class="screen">
-  <div style="font-size:36px;margin-bottom:8px">👾</div>
-  <div class="setup-box">
-    <div style="font-size:22px;font-weight:500;margin-bottom:6px;">Welcome, <span id="setup-name">Commander</span>!</div>
-    <div style="font-size:13px;color:var(--text3);margin-bottom:1.5rem;">Choose your commander avatar</div>
-    <div class="gender-grid">
-      <div class="gender-card selected" id="gender-m" onclick="selectGender('m')">
-        <div style="font-size:40px;margin-bottom:8px;">🧑</div>
-        <div>Male</div>
-      </div>
-      <div class="gender-card" id="gender-f" onclick="selectGender('f')">
-        <div style="font-size:40px;margin-bottom:8px;">👩</div>
-        <div>Female</div>
-      </div>
-    </div>
-    <button class="form-btn" onclick="finishSetup()">Launch Mission →</button>
-  </div>
-</div>
-
-<!-- MAIN SCREEN -->
-<div id="main-screen" class="screen">
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('game')" id="tab-game">⭐ Clicker</button>
-    <button class="tab-btn" onclick="switchTab('spin')" id="tab-spin">📦 Crates</button>
-    <button class="tab-btn" onclick="switchTab('cosm')" id="tab-cosm">👗 Wardrobe</button>
-    <button class="tab-btn" onclick="switchTab('profile')" id="tab-profile">👤 Profile</button>
-    <button class="tab-btn" onclick="switchTab('prestige')" id="tab-prestige">⚛️ Celestial</button>
-  </div>
-
-  <div class="tab-panel active" id="panel-game">
-    <div style="text-align:center;padding:0.6rem 1rem 0.3rem;display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:12px;color:var(--text3);">Commander <strong id="hdr-name" style="color:var(--text2)"></strong></div>
-      <div id="hdr-title-badge"></div>
-      <button class="logout-btn" onclick="doLogout()">Log Out</button>
-    </div>
-
-    <!-- FRENZY BANNER -->
-    <div id="frenzy-banner">🔥 STAR FRENZY ACTIVE! 7X MULTIPLIER (<span id="frenzy-timer">15</span>s) 🔥</div>
-
-    <div style="text-align:center;font-size:11px;color:var(--text4);margin-bottom:3px;">Crate in <span id="spin-cd" style="color:var(--text2);font-weight:500;">500</span> clicks</div>
-    <div class="spin-bar-wrap"><div class="spin-bar-bg"><div class="spin-bar-fill" id="spin-fill" style="width:0%"></div></div></div>
-
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">Total Stars</div><div class="stat-val" id="total-count">0</div></div>
-      <div class="stat-card"><div class="stat-label">Per Click</div><div class="stat-val" id="per-click">1</div></div>
-      <div class="stat-card"><div class="stat-label">Per Second</div><div class="stat-val" id="per-sec">0</div></div>
-    </div>
-
-    <!-- COMBO MULTIPLIER BAR -->
-    <div id="combo-container">
-      <span style="font-size:11px;color:var(--text3);font-weight:bold;">COMBO</span>
-      <div class="combo-bar-wrap"><div class="combo-bar-fill" id="combo-fill"></div></div>
-      <div id="combo-mult">1.0x</div>
-    </div>
-
-    <div id="star-wrap">
-      <button id="star-btn" aria-label="Click the star">⭐</button>
-    </div>
-
-    <div id="spins-avail" style="text-align:center;font-size:13px;color:var(--gold);font-weight:500;"></div>
-
-    <div class="section-label">Upgrades</div>
-    <div id="upg-grid"></div>
-  </div>
-
-  <div class="tab-panel" id="panel-spin">
-    <div id="crate-area">
-      <div style="font-size:12px;color:var(--text4);margin-bottom:4px;">Earn a crate every 500 clicks</div>
-      <div id="crate-visual">📦</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:4px;">You have <span id="spin-count-display" style="color:var(--gold);font-weight:bold;">0</span> crates</div>
-      <button class="big-spin-btn" id="spin-btn" disabled onclick="spinReel()">Open Crate</button>
-    </div>
-    <div id="reel-outer"><div id="reel-center-line"></div><div id="reel-track"></div></div>
-    <div id="reel-result"><div style="font-size:12px;color:var(--text4);">Open a crate to reveal legendary titles!</div></div>
-    <div class="section-label">Your Titles</div>
-    <div id="owned-titles-grid"></div>
-  </div>
-
-  <div class="tab-panel" id="panel-cosm">
-    <div style="padding:0 1rem;">
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:0.75rem;">
-        <div id="avatar-preview-cosm"></div>
-        <div>
-          <div style="font-size:14px;font-weight:bold;color:var(--text2);">Style Vault</div>
-          <div style="font-size:13px;color:var(--gold);">⭐ <span id="shop-star-count">0</span> stars</div>
-        </div>
-      </div>
-      <div class="cosm-tabs" id="cosm-cat-tabs"></div>
-      <div id="cosm-grid"></div>
-    </div>
-  </div>
-
-  <div class="tab-panel" id="panel-profile">
-    <div class="profile-card">
-      <div id="avatar-display-large" style="text-align:center;"></div>
-      <div style="font-size:22px;font-weight:bold;text-align:center;margin-top:8px;" id="profile-name-display"></div>
-      <div style="text-align:center;margin:4px 0 10px;" id="profile-title-display"></div>
-      <div class="profile-stats">
-        <div class="profile-stat"><div class="stat-val" id="prof-stars">0</div><div class="stat-label">Total Stars</div></div>
-        <div class="profile-stat"><div class="stat-val" id="prof-titles">0</div><div class="stat-label">Titles</div></div>
-        <div class="profile-stat"><div class="stat-val" id="prof-dust">0</div><div class="stat-label">Celestial Dust</div></div>
-        <div class="profile-stat"><div class="stat-val" id="prof-cps">0</div><div class="stat-label">Stars / Sec</div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab-panel" id="panel-prestige">
-    <div class="prestige-card">
-      <div style="font-size:16px;font-weight:bold;color:#cc88ff;margin-bottom:4px;">⚛️ Celestial Ascension</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Reset stars and base upgrades to gain Celestial Dust. Keep all crates, titles, and cosmetics!</div>
-      <div style="font-size:13px;color:var(--gold);margin-bottom:12px;">Pending Dust: +<span id="pending-dust">0</span> ✨</div>
-      <button class="prestige-btn" id="prestige-btn" onclick="doPrestige()">Ascend Now</button>
-    </div>
-    <div class="section-label">Celestial Perks</div>
-    <div class="perk-grid" id="perk-grid"></div>
-  </div>
-</div>
-</div>
-
-<script>
-/* ================= SYNTH AUDIO ENGINE ================= */
-class SoundEngine {
-  constructor() { this.ctx = null; }
-  init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
-  playClick(pitch = 1) {
-    if(!this.ctx) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(440 * pitch, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(880 * pitch, this.ctx.currentTime + 0.05);
-    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
-    osc.connect(gain); gain.connect(this.ctx.destination);
-    osc.start(); osc.stop(this.ctx.currentTime + 0.05);
-  }
-  playCrit() {
-    if(!this.ctx) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1046.50, this.ctx.currentTime + 0.15);
-    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-    osc.connect(gain); gain.connect(this.ctx.destination);
-    osc.start(); osc.stop(this.ctx.currentTime + 0.15);
-  }
-  playGolden() {
-    if(!this.ctx) return;
-    [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.06);
-      gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.06);
-      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.06 + 0.2);
-      osc.connect(gain); gain.connect(this.ctx.destination);
-      osc.start(this.ctx.currentTime + i * 0.06);
-      osc.stop(this.ctx.currentTime + i * 0.06 + 0.2);
+  // Render Category Tabs
+  const catTabs = document.getElementById('cosm-cat-tabs');
+  const categories = ['hats', 'skins', 'auras', 'skintones'];
+  if (catTabs) {
+    catTabs.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'cosm-tab' + (state.activeCosmCategory === cat ? ' active' : '');
+      btn.textContent = cat.toUpperCase();
+      btn.onclick = () => {
+        state.activeCosmCategory = cat;
+        renderWardrobe();
+      };
+      catTabs.appendChild(btn);
     });
   }
-}
-const SFX = new SoundEngine();
 
-/* ================= CANVAS PARTICLE ENGINE ================= */
-const canvas = document.getElementById('fx-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
+  // Render Grid Items
+  const grid = document.getElementById('cosm-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
 
-function spawnParticles(x, y, color = '#ffd700', count = 12) {
-  for(let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 2 + Math.random() * 6;
-    particles.push({
-      x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      size: 3 + Math.random() * 4, alpha: 1, color
-    });
-  }
-}
+  const filtered = COSMETICS_DATA.filter(item => item.cat === state.activeCosmCategory);
 
-function updateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach((p, index) => {
-    p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.alpha -= 0.02;
-    ctx.fillStyle = p.color; ctx.globalAlpha = Math.max(0, p.alpha);
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-    if(p.alpha <= 0) particles.splice(index, 1);
-  });
-  requestAnimationFrame(updateParticles);
-}
-updateParticles();
+  filtered.forEach(item => {
+    const isOwned = (state.ownedCosmetics || []).includes(item.id);
+    const isEquipped = state.equippedCosmetics && state.equippedCosmetics[item.cat] === item.id;
 
-/* ================= GAME DATA ================= */
-const RARITIES = [
-  {name:'common', color:'#888780', bg:'#1a1a1a', chance:1/2, display:'1 in 2', resultClass:'result-anim-common'},
-  {name:'uncommon', color:'#5DCAA5', bg:'#04201a', chance:1/5, display:'1 in 5', resultClass:'result-anim-uncommon'},
-  {name:'rare', color:'#378ADD', bg:'#041428', chance:1/20, display:'1 in 20', resultClass:'result-anim-rare'},
-  {name:'epic', color:'#AFA9EC', bg:'#12103a', chance:1/100, display:'1 in 100', resultClass:'result-anim-epic'},
-  {name:'legendary', color:'#ffd700', bg:'#1a1200', chance:1/500, display:'1 in 500', resultClass:'result-anim-legendary'},
-  {name:'mythic', color:'#ff6fff', bg:'#1a0020', chance:1/5000, display:'1 in 5,000', resultClass:'result-anim-mythic'},
-  {name:'secret', color:'#fff', bg:'#000030', chance:1/1000000, display:'1 in 1,000,000', resultClass:'result-anim-secret'}
-];
+    const card = document.createElement('div');
+    card.className = 'cosm-item' + (isEquipped ? ' equipped' : '');
+    
+    // Style adjustments for custom skin tones
+    const iconStyle = item.color ? `style="text-shadow: 0 0 10px ${item.color}; color: ${item.color}"` : '';
 
-const TITLES_DATA = [
-  {n:'Stardust', i:'💨', r:0}, {n:'Sky Gazer', i:'👀', r:0}, {n:'Moonwalker', i:'🌙', r:0},
-  {n:'Pulsar Knight', i:'💫', r:1}, {n:'Void Sailor', i:'⛵', r:1}, {n:'Quasar Chaser', i:'🔭', r:1},
-  {n:'Galactic Ranger', i:'🔭', r:2}, {n:'Photon Blade', i:'⚔️', r:2}, {n:'Quantum Drifter', i:'⚛️', r:2},
-  {n:'Galactic Emperor', i:'👑', r:3}, {n:'Cosmic Ruler', i:'🌌', r:3}, {n:'Hypernova King', i:'💥', r:3},
-  {n:'Stellar Oracle', i:'🌟', r:4}, {n:'Celestial One', i:'☀️', r:4}, {n:'Diamond Cosmos', i:'💎', r:4},
-  {n:'Absolute Zero', i:'🧊', r:5}, {n:'Multiverse Sovereign', i:'♾️', r:5}, {n:'⭐ Star God', i:'⭐', r:6}
-];
-
-const UPGRADES = [
-  {id:'wand', name:'Magic Wand', icon:'🪄', desc:'+1/click', costBase:15, type:'click', value:1, owned:0},
-  {id:'orbit', name:'Star Orbit', icon:'🌀', desc:'+1/sec', costBase:40, type:'cps', value:1, owned:0},
-  {id:'comet', name:'Comet Trail', icon:'☄️', desc:'+4/click', costBase:120, type:'click', value:4, owned:0},
-  {id:'pulsar', name:'Pulsar Beam', icon:'💫', desc:'+5/sec', costBase:300, type:'cps', value:5, owned:0},
-  {id:'nova', name:'Supernova Tap', icon:'💥', desc:'+15/click', costBase:1000, type:'click', value:15, owned:0},
-  {id:'robot', name:'Star Robot', icon:'🤖', desc:'+20/sec', costBase:2000, type:'cps', value:20, owned:0},
-  {id:'galaxy', name:'Galaxy Forge', icon:'🌌', desc:'+50/click', costBase:8000, type:'click', value:50, owned:0},
-  {id:'black', name:'Black Hole', icon:'🕳️', desc:'+150/sec', costBase:50000, type:'cps', value:150, owned:0}
-];
-
-const PERKS = [
-  {id:'critChan', name:'Super Crits', icon:'⚡', desc:'+3% Crit Chance', costBase:1, val:0.03, owned:0},
-  {id:'critPow', name:'Overload', icon:'💥', desc:'+2x Crit Multiplier', costBase:2, val:2, owned:0},
-  {id:'goldenFreq', name:'Luck Magnet', icon:'🧲', desc:'Golden Stars appear 20% faster', costBase:3, val:0.2, owned:0},
-  {id:'cpsBoost', name:'Cosmic Flow', icon:'🌌', desc:'+10% Passive CPS', costBase:5, val:0.1, owned:0}
-];
-
-let state = {
-  loggedIn: false, username: '', count: 0, perClick: 1, cps: 0,
-  spinsAvailable: 0, clicksSinceLastSpin: 0,
-  equippedTitle: null, ownedTitles: [],
-  upgrades: JSON.parse(JSON.stringify(UPGRADES)),
-  perks: JSON.parse(JSON.stringify(PERKS)),
-  celestialDust: 0, totalEarned: 0,
-  comboHits: 0, comboMult: 1.0, lastClickTime: 0,
-  frenzyTime: 0, reelSpinning: false, gender: 'm'
-};
-
-const SPIN_EVERY = 500;
-
-/* ================= GAME LOOP & ENGINE ================= */
-function fmt(n) {
-  n = Math.floor(n);
-  if(n >= 1e9) return (n/1e9).toFixed(2) + 'B';
-  if(n >= 1e6) return (n/1e6).toFixed(2) + 'M';
-  if(n >= 1e3) return (n/1e3).toFixed(1) + 'k';
-  return n.toLocaleString();
-}
-
-function getCost(u) { return Math.floor(u.costBase * Math.pow(1.5, u.owned)); }
-function getPerkCost(p) { return Math.floor(p.costBase * Math.pow(2.2, p.owned)); }
-
-function updateStats() {
-  document.getElementById('total-count').textContent = fmt(state.count);
-  document.getElementById('per-click').textContent = fmt(getEffectiveClickPower());
-  document.getElementById('per-sec').textContent = fmt(getEffectiveCPS());
-  document.getElementById('spin-fill').style.width = Math.min((state.clicksSinceLastSpin / SPIN_EVERY) * 100, 100) + '%';
-  document.getElementById('spin-cd').textContent = Math.max(0, SPIN_EVERY - state.clicksSinceLastSpin);
-  document.getElementById('spins-avail').textContent = state.spinsAvailable > 0 ? '📦 ' + state.spinsAvailable + ' crate(s) ready!' : '';
-  
-  const sd = document.getElementById('spin-count-display');
-  if(sd) sd.textContent = state.spinsAvailable;
-  document.getElementById('spin-btn').disabled = state.spinsAvailable <= 0 || state.reelSpinning;
-  
-  document.getElementById('prof-stars').textContent = fmt(state.count);
-  document.getElementById('prof-cps').textContent = fmt(getEffectiveCPS());
-  document.getElementById('prof-dust').textContent = state.celestialDust;
-  
-  // Pending dust on prestige
-  const pending = Math.floor(Math.pow(state.totalEarned / 100000, 0.4));
-  document.getElementById('pending-dust').textContent = pending;
-}
-
-function getEffectiveCPS() {
-  let cpsBoost = 1 + (state.perks.find(p => p.id === 'cpsBoost').owned * 0.1);
-  return state.cps * cpsBoost * (state.frenzyTime > 0 ? 7 : 1);
-}
-
-function getEffectiveClickPower() {
-  return state.perClick * state.comboMult * (state.frenzyTime > 0 ? 7 : 1);
-}
-
-function renderUpgrades() {
-  const g = document.getElementById('upg-grid');
-  g.innerHTML = '';
-  state.upgrades.forEach(u => {
-    const c = getCost(u);
-    const b = document.createElement('button');
-    b.className = 'upgrade-btn';
-    if(state.count < c) b.setAttribute('disabled', '');
-    b.innerHTML = `<div class="upg-name">${u.icon} ${u.name} <span style="color:var(--accent2)">x${u.owned}</span></div>
-                   <div class="upg-desc">${u.desc}</div>
-                   <div class="upg-cost">⭐ ${fmt(c)}</div>`;
-    b.onclick = () => buyUpgrade(u);
-    g.appendChild(b);
+    card.innerHTML = `
+      <span class="cosm-icon" ${iconStyle}>${item.icon}</span>
+      <div class="cosm-name">${item.name}</div>
+      <div class="cosm-desc" style="font-size:0.75rem; color:#aaa; margin: 4px 0;">${item.desc}</div>
+      <div class="cosm-price" style="color:${isEquipped ? '#4ade80' : isOwned ? '#60a5fa' : 'var(--gold)'}">
+        ${isEquipped ? 'EQUIPPED' : isOwned ? 'EQUIP' : '⭐ ' + fmt(item.price)}
+      </div>
+    `;
+    card.onclick = () => handleCosmeticClick(item);
+    grid.appendChild(card);
   });
 }
 
-function buyUpgrade(u) {
-  const c = getCost(u);
-  if(state.count < c) return;
-  state.count -= c; u.owned++;
-  if(u.type === 'click') state.perClick += u.value;
-  else state.cps += u.value;
-  SFX.playClick(1.4);
-  updateStats(); renderUpgrades(); saveUser();
-}
+function handleCosmeticClick(item) {
+  if (!state.ownedCosmetics) state.ownedCosmetics = [];
+  if (!state.equippedCosmetics) state.equippedCosmetics = {};
 
-function renderPerks() {
-  const g = document.getElementById('perk-grid');
-  if(!g) return;
-  g.innerHTML = '';
-  state.perks.forEach(p => {
-    const c = getPerkCost(p);
-    const b = document.createElement('button');
-    b.className = 'perk-btn';
-    if(state.celestialDust < c) b.setAttribute('disabled', '');
-    b.innerHTML = `<div class="upg-name">${p.icon} ${p.name} <span style="color:#cc88ff">Lv.${p.owned}</span></div>
-                   <div class="upg-desc">${p.desc}</div>
-                   <div class="upg-cost">✨ ${c} Dust</div>`;
-    b.onclick = () => buyPerk(p);
-    g.appendChild(b);
-  });
-}
+  const isOwned = state.ownedCosmetics.includes(item.id);
 
-function buyPerk(p) {
-  const c = getPerkCost(p);
-  if(state.celestialDust < c) return;
-  state.celestialDust -= c;
-  p.owned++;
-  SFX.playGolden();
-  renderPerks(); updateStats(); saveUser();
-}
-
-/* ================= CLICKING & JUICE ================= */
-const starBtn = document.getElementById('star-btn');
-starBtn.addEventListener('click', (e) => {
-  SFX.init();
-  const now = Date.now();
-  
-  // Combo mechanics
-  if(now - state.lastClickTime < 400) {
-    state.comboHits = Math.min(state.comboHits + 1, 50);
+  if (isOwned) {
+    // Equip or Unequip
+    if (state.equippedCosmetics[item.cat] === item.id) {
+      delete state.equippedCosmetics[item.cat];
+    } else {
+      state.equippedCosmetics[item.cat] = item.id;
+    }
   } else {
-    state.comboHits = Math.max(0, state.comboHits - 5);
-  }
-  state.lastClickTime = now;
-  state.comboMult = 1.0 + (state.comboHits * 0.1);
-  
-  // Crit Roll
-  const critChance = 0.05 + (state.perks.find(p => p.id === 'critChan').owned * 0.03);
-  const isCrit = Math.random() < critChance;
-  const critPow = 10 + (state.perks.find(p => p.id === 'critPow').owned * 2);
-  
-  let earned = getEffectiveClickPower();
-  if(isCrit) earned *= critPow;
-  
-  state.count += earned;
-  state.totalEarned += earned;
-  state.clicksSinceLastSpin++;
-  if(state.clicksSinceLastSpin >= SPIN_EVERY) {
-    state.clicksSinceLastSpin = 0; state.spinsAvailable++;
-  }
-
-  // Visual juice
-  const rect = starBtn.getBoundingClientRect();
-  const cx = e.clientX || (rect.left + rect.width / 2);
-  const cy = e.clientY || (rect.top + rect.height / 2);
-  
-  spawnParticles(cx, cy, isCrit ? '#ff3366' : '#ffd700', isCrit ? 22 : 8);
-  showPop(cx, cy, earned, isCrit);
-  
-  if(isCrit) {
-    SFX.playCrit();
-    starBtn.classList.remove('crit-bounce');
-    void starBtn.offsetWidth;
-    starBtn.classList.add('crit-bounce');
-  } else {
-    SFX.playClick(1 + (state.comboHits * 0.02));
-  }
-
-  updateStats(); renderUpgrades(); saveUser();
-});
-
-function showPop(x, y, val, isCrit) {
-  const wrap = document.getElementById('star-wrap');
-  const r = wrap.getBoundingClientRect();
-  const pop = document.createElement('div');
-  pop.className = 'star-pop' + (isCrit ? ' crit' : '');
-  pop.textContent = (isCrit ? 'CRIT! +' : '+') + fmt(val);
-  pop.style.left = (x - r.left + (Math.random() * 20 - 10)) + 'px';
-  pop.style.top = (y - r.top - 10) + 'px';
-  wrap.appendChild(pop);
-  setTimeout(() => pop.remove(), 800);
-}
-
-/* ================= GOLDEN STAR EVENT ================= */
-function spawnGoldenStar() {
-  if(document.querySelector('.golden-star-event')) return;
-  const gs = document.createElement('div');
-  gs.className = 'golden-star-event';
-  gs.textContent = '🌟';
-  gs.onclick = () => {
-    SFX.playGolden();
-    spawnParticles(window.innerWidth/2, window.innerHeight/2, '#ffd700', 50);
-    triggerFrenzy();
-    gs.remove();
-  };
-  document.body.appendChild(gs);
-  setTimeout(() => { if(gs.parentNode) gs.remove(); }, 12000);
-}
-
-function triggerFrenzy() {
-  state.frenzyTime = 15;
-  document.getElementById('frenzy-banner').style.display = 'block';
-  updateStats();
-}
-
-setInterval(() => {
-  if(state.frenzyTime > 0) {
-    state.frenzyTime--;
-    document.getElementById('frenzy-timer').textContent = state.frenzyTime;
-    if(state.frenzyTime <= 0) {
-      document.getElementById('frenzy-banner').style.display = 'none';
-      updateStats();
+    // Purchase item
+    if (state.count >= item.price) {
+      state.count -= item.price;
+      state.ownedCosmetics.push(item.id);
+      state.equippedCosmetics[item.cat] = item.id;
+      if (typeof SFX !== 'undefined' && SFX.playGolden) SFX.playGolden();
     }
   }
-}, 1000);
 
-// Random Spawner (every 40-80s base)
-setInterval(() => {
-  const freqPerk = state.perks.find(p => p.id === 'goldenFreq').owned * 0.2;
-  const chance = 0.3 * (1 + freqPerk);
-  if(Math.random() < chance) spawnGoldenStar();
-}, 25000);
+  applyCosmeticVisuals();
+  if (typeof updateStats === 'function') updateStats();
+  renderWardrobe();
+  if (typeof saveUser === 'function') saveUser();
+}
 
-/* ================= MAIN ENGINE TICK (10Hz) ================= */
-setInterval(() => {
-  if(state.cps > 0) {
-    const gained = getEffectiveCPS() / 10;
-    state.count += gained;
-    state.totalEarned += gained;
-    updateStats();
+// Applies visual custom skin tone / aura styles directly to the player star element
+function applyCosmeticVisuals() {
+  const mainStar = document.getElementById('main-star');
+  if (!mainStar) return;
+
+  const equipped = state.equippedCosmetics || {};
+  const toneItem = COSMETICS_DATA.find(c => c.id === equipped['skintones']);
+
+  if (toneItem && toneItem.color) {
+    mainStar.style.filter = `drop-shadow(0 0 15px ${toneItem.color})`;
+  } else {
+    mainStar.style.filter = '';
   }
-  
-  // Combo Decay
-  if(Date.now() - state.lastClickTime > 1200) {
-    state.comboHits = Math.max(0, state.comboHits - 1);
-    state.comboMult = 1.0 + (state.comboHits * 0.1);
-  }
-  
-  document.getElementById('combo-fill').style.width = (state.comboHits / 50 * 100) + '%';
-  document.getElementById('combo-mult').textContent = state.comboMult.toFixed(1) + 'x';
-}, 100);
-
-/* ================= PRESTIGE & CRATES ================= */
-function doPrestige() {
-  const gained = Math.floor(Math.pow(state.totalEarned / 100000, 0.4));
-  if(gained < 1) return;
-  
-  state.celestialDust += gained;
-  state.count = 0; state.perClick = 1; state.cps = 0;
-  state.upgrades = JSON.parse(JSON.stringify(UPGRADES));
-  
-  SFX.playGolden();
-  renderPerks(); renderUpgrades(); updateStats(); saveUser();
-  switchTab('prestige');
 }
 
-function spinReel() {
-  if(state.spinsAvailable <= 0 || state.reelSpinning) return;
-  state.spinsAvailable--; state.reelSpinning = true;
-  document.getElementById('spin-btn').disabled = true;
-  
-  const crate = document.getElementById('crate-visual');
-  crate.classList.add('shake');
-  setTimeout(() => crate.classList.remove('shake'), 500);
-
-  const winner = TITLES_DATA[Math.floor(Math.random() * TITLES_DATA.length)];
-  const track = document.getElementById('reel-track');
-  track.innerHTML = '';
-  
-  for(let i=0; i<30; i++) {
-    const t = TITLES_DATA[Math.floor(Math.random() * TITLES_DATA.length)];
-    const card = document.createElement('div'); card.className = 'reel-card';
-    card.style.background = RARITIES[t.r].bg; card.style.borderColor = RARITIES[t.r].color;
-    card.innerHTML = `<div class="rc-icon">${t.i}</div><div class="rc-name" style="color:${RARITIES[t.r].color}">${t.n}</div>`;
-    track.appendChild(card);
-  }
-  
-  // Add winner
-  const card = document.createElement('div'); card.className = 'reel-card';
-  card.style.background = RARITIES[winner.r].bg; card.style.borderColor = RARITIES[winner.r].color;
-  card.innerHTML = `<div class="rc-icon">${winner.i}</div><div class="rc-name" style="color:${RARITIES[winner.r].color}">${winner.n}</div>`;
-  track.appendChild(card);
-
-  track.style.transition = 'none';
-  track.style.transform = 'translateX(0px)';
-  
-  setTimeout(() => {
-    track.style.transition = 'transform 3.2s cubic-bezier(0.1, 0, 0.1, 1)';
-    track.style.transform = 'translateX(-2300px)';
-    setTimeout(() => {
-      state.reelSpinning = false;
-      if(!state.ownedTitles.includes(winner.n)) state.ownedTitles.push(winner.n);
-      renderSpinTab();
-      document.getElementById('reel-result').innerHTML = `<div style="color:${RARITIES[winner.r].color};font-size:18px;font-weight:bold;">${winner.i} ${winner.n}</div>`;
-      SFX.playGolden();
-      updateStats(); saveUser();
-    }, 3300);
-  }, 50);
-}
-
-function renderSpinTab() {
-  const g = document.getElementById('owned-titles-grid');
-  if(!g) return; g.innerHTML = '';
-  state.ownedTitles.forEach(name => {
-    const t = TITLES_DATA.find(x => x.n === name);
-    if(!t) return;
-    const rar = RARITIES[t.r];
-    const pill = document.createElement('div');
-    pill.className = 'title-pill' + (state.equippedTitle === name ? ' equipped' : '');
-    pill.style.cssText = `background:${rar.bg};color:${rar.color};border:1px solid ${rar.color}`;
-    pill.textContent = t.i + ' ' + t.n;
-    pill.onclick = () => {
-      state.equippedTitle = state.equippedTitle === name ? null : name;
-      renderSpinTab(); updateHeaderBadge(); saveUser();
-    };
-    g.appendChild(pill);
-  });
-}
-
-function updateHeaderBadge() {
-  const el = document.getElementById('hdr-title-badge');
-  if(state.equippedTitle) {
-    const t = TITLES_DATA.find(x => x.n === state.equippedTitle);
-    if(t) el.innerHTML = `<span class="title-badge" style="background:${RARITIES[t.r].bg};color:${RARITIES[t.r].color}">${t.i} ${t.n}</span>`;
-  } else el.innerHTML = '';
-}
-
-/* ================= AUTH & SYSTEM INIT ================= */
-function storageKey(u) { return 'sc_user_' + u; }
-function saveUser() {
-  if(!state.loggedIn) return;
-  localStorage.setItem(storageKey(state.username), JSON.stringify(state));
-}
-
-function loadUser(u) {
-  const raw = localStorage.getItem(storageKey(u));
-  return raw ? JSON.parse(raw) : null;
-}
-
-function authTab(t) {
-  document.getElementById('login-form').style.display = t === 'login' ? '' : 'none';
-  document.getElementById('register-form').style.display = t === 'register' ? '' : 'none';
-  document.querySelectorAll('.auth-tab').forEach((b,i) => b.classList.toggle('active', i === (t === 'login' ? 0 : 1)));
-}
-
-function doLogin() {
-  const name = document.getElementById('login-name').value.trim();
-  if(!name) return;
-  state.username = name; state.loggedIn = true;
-  const data = loadUser(name);
-  if(data) Object.assign(state, data);
-  showScreen('main-screen');
-  enterMain();
-}
-
-function doRegister() {
-  const name = document.getElementById('reg-name').value.trim();
-  if(!name) return;
-  state.username = name; state.loggedIn = true;
-  showScreen('setup-screen');
-}
-
-function finishSetup() {
-  showScreen('main-screen');
-  enterMain();
-}
-
-function doLogout() {
-  saveUser(); state.loggedIn = false;
-  showScreen('auth-screen');
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
+// ----------------------------------------------------
+// 4. TAB & GAME ENGINE HOOKS
+// ----------------------------------------------------
 function switchTab(t) {
   ['game','spin','cosm','profile','prestige'].forEach(id => {
     const btn = document.getElementById('tab-' + id);
@@ -770,17 +157,7 @@ function switchTab(t) {
       panel.classList.toggle('active', id === t);
     }
   });
-  if(t === 'prestige') renderPerks();
-  if(t === 'spin') renderSpinTab();
+  if(t === 'prestige' && typeof renderPerks === 'function') renderPerks();
+  if(t === 'spin' && typeof renderSpinTab === 'function') renderSpinTab();
+  if(t === 'cosm') renderWardrobe();
 }
-
-function enterMain() {
-  document.getElementById('hdr-name').textContent = state.username;
-  document.getElementById('profile-name-display').textContent = state.username;
-  updateStats(); renderUpgrades(); updateHeaderBadge();
-}
-
-window.onload = () => { switchTab('game'); };
-</script>
-</body>
-</html>
