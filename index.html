@@ -1,37 +1,151 @@
-// ----------------------------------------------------
-// 1. COSMETICS DATASET (Hats, Skins, Auras, Skin Tones)
-// ----------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Clicker: Celestial Edition</title>
+  <style>
+    :root {
+      --bg: #0b0d19;
+      --card-bg: #161b33;
+      --accent: #6366f1;
+      --gold: #f59e0b;
+      --dust: #a855f7;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; min-height: 100vh; padding: 20px; }
+    
+    .game-container { width: 100%; max-width: 500px; background: #111428; border-radius: 16px; border: 1px solid #2d3748; padding: 20px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+
+    .header { text-align: center; background: var(--card-bg); padding: 15px; border-radius: 12px; }
+    .currency-display { font-size: 1.8rem; font-weight: bold; color: var(--gold); }
+    .sub-currency { font-size: 0.9rem; color: var(--dust); margin-top: 4px; }
+
+    .nav-tabs { display: flex; gap: 8px; background: var(--card-bg); padding: 6px; border-radius: 10px; }
+    .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+    .tab-btn.active { background: var(--accent); color: white; }
+
+    .panel { display: none; flex-direction: column; gap: 12px; }
+    .panel.active { display: flex; }
+
+    /* Clicker Area */
+    .click-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; position: relative; user-select: none; }
+    .star-btn { font-size: 6rem; cursor: pointer; transition: transform 0.1s ease; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3)); }
+    .star-btn:active { transform: scale(0.9); }
+    .stats-row { display: flex; justify-content: space-between; width: 100%; font-size: 0.85rem; color: var(--text-muted); }
+
+    /* Upgrades & Shop */
+    .upgrade-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+    .upgrade-card, .cosm-item { background: var(--card-bg); border: 1px solid #2d3748; padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .upgrade-card:hover, .cosm-item:hover { border-color: var(--accent); }
+
+    /* Wardrobe Grid */
+    .cosm-cat-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+    .cosm-tab { flex: 1; padding: 6px; font-size: 0.75rem; background: var(--card-bg); border: 1px solid #2d3748; color: var(--text); border-radius: 6px; cursor: pointer; }
+    .cosm-tab.active { border-color: var(--gold); background: #22294a; }
+    .cosm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: 300px; overflow-y: auto; }
+    .cosm-item { flex-direction: column; text-align: center; gap: 6px; position: relative; }
+    .cosm-item.equipped { border-color: #4ade80; background: #132a20; }
+    .cosm-icon { font-size: 2rem; }
+
+    /* Celestial Tab */
+    .celestial-card { background: #1a102f; border: 1px solid var(--dust); padding: 16px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; gap: 10px; }
+    .btn-ascend { background: var(--dust); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-ascend:hover { opacity: 0.9; }
+
+    /* Floating Click Text Animation */
+    .click-text { position: absolute; color: var(--gold); font-weight: bold; pointer-events: none; animation: floatUp 0.8s ease-out forwards; }
+    @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <div class="header">
+    <div class="currency-display">⭐ <span id="star-count">0</span></div>
+    <div class="sub-currency">⚛️ Celestial Dust: <span id="dust-count">0</span></div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" id="tab-game" onclick="switchTab('game')">Game</button>
+    <button class="tab-btn" id="tab-cosm" onclick="switchTab('cosm')">Wardrobe</button>
+    <button class="tab-btn" id="tab-prestige" onclick="switchTab('prestige')">Celestial</button>
+  </div>
+
+  <!-- GAME PANEL -->
+  <div class="panel active" id="panel-game">
+    <div class="click-zone" id="click-zone">
+      <div class="star-btn" id="main-star" onclick="clickStar(event)">⭐</div>
+    </div>
+    <div class="stats-row">
+      <span>Per Click: <strong id="click-power">1</strong></span>
+      <span>Per Second: <strong id="cps-val">0</strong></span>
+    </div>
+    <div class="upgrade-list" id="upgrade-list"></div>
+  </div>
+
+  <!-- WARDROBE PANEL -->
+  <div class="panel" id="panel-cosm">
+    <div class="cosm-cat-tabs" id="cosm-cat-tabs"></div>
+    <div class="cosm-grid" id="cosm-grid"></div>
+  </div>
+
+  <!-- CELESTIAL PANEL -->
+  <div class="panel" id="panel-prestige">
+    <div class="celestial-card">
+      <h3>✨ Celestial Ascension</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">Reset your stars and base upgrades to gain Celestial Dust. Dust provides permanent power boosts!</p>
+      <div>Pending Dust: <strong id="pending-dust" style="color: var(--dust)">0</strong></div>
+      <button class="btn-ascend" onclick="ascend()">Ascend Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- GAME STATE ---
+let state = {
+  count: 0,
+  totalEarned: 0,
+  dust: 0,
+  baseClickPower: 1,
+  baseCPS: 0,
+  activeCosmCategory: 'hats',
+  ownedCosmetics: [],
+  equippedCosmetics: {},
+  upgrades: {
+    cursor: { count: 0, cost: 15, cps: 1 },
+    booster: { count: 0, cost: 100, clickPower: 2 },
+    starfield: { count: 0, cost: 1100, cps: 8 }
+  }
+};
+
+// --- COSMETICS DATA (Hats, Skins, Auras, Skin Tones + Effects) ---
 const COSMETICS_DATA = [
   // HATS
   { id: 'hat_cap', name: 'Snapback Cap', cat: 'hats', icon: '🧢', price: 500, desc: '+5% Click Power', effect: { clickMult: 0.05 } },
   { id: 'hat_crown', name: 'Royal Crown', cat: 'hats', icon: '👑', price: 25000, desc: '+15% All Stars', effect: { cpsMult: 0.15 } },
   { id: 'hat_halo', name: 'Angelic Halo', cat: 'hats', icon: '😇', price: 150000, desc: '+25% Celestial Dust', effect: { dustMult: 0.25 } },
-  { id: 'hat_wizard', name: 'Arcane Hat', cat: 'hats', icon: '🧙‍♂️', price: 750000, desc: '+30% Click Power', effect: { clickMult: 0.30 } },
 
   // SKINS
   { id: 'skin_alien', name: 'Zeta Alien', cat: 'skins', icon: '👽', price: 2500, desc: '+10% Passive Stars', effect: { cpsMult: 0.10 } },
   { id: 'skin_robot', name: 'Cyber Android', cat: 'skins', icon: '🤖', price: 50000, desc: '+20% Click Power', effect: { clickMult: 0.20 } },
-  { id: 'skin_dragon', name: 'Draconic Form', cat: 'skins', icon: '🐉', price: 500000, desc: '+35% All Stars', effect: { cpsMult: 0.35 } },
 
   // AURAS
   { id: 'bg_space', name: 'Deep Space', cat: 'auras', icon: '🌌', price: 5000, desc: '+10% All Stars', effect: { cpsMult: 0.10 } },
   { id: 'bg_fire', name: 'Inferno Aura', cat: 'auras', icon: '🔥', price: 75000, desc: '+25% Click Power', effect: { clickMult: 0.25 } },
-  { id: 'bg_supernova', name: 'Supernova Burst', cat: 'auras', icon: '💥', price: 1000000, desc: '+50% All Stars & +20% Dust', effect: { cpsMult: 0.50, dustMult: 0.20 } },
 
   // SKIN TONES
   { id: 'tone_gold', name: 'Midas Gold', cat: 'skintones', icon: '✨', price: 10000, desc: '+12% Click Power', color: '#ffd700', effect: { clickMult: 0.12 } },
   { id: 'tone_neon', name: 'Neon Cyan', cat: 'skintones', icon: '🩵', price: 30000, desc: '+12% Passive Stars', color: '#00f3ff', effect: { cpsMult: 0.12 } },
-  { id: 'tone_void', name: 'Void Purple', cat: 'skintones', icon: '💜', price: 200000, desc: '+20% Click & +15% Dust', color: '#a855f7', effect: { clickMult: 0.20, dustMult: 0.15 } },
-  { id: 'tone_obsidian', name: 'Shadow Obsidian', cat: 'skintones', icon: '🖤', price: 2000000, desc: '+50% All Stars', color: '#1e1b4b', effect: { cpsMult: 0.50 } }
+  { id: 'tone_void', name: 'Void Purple', cat: 'skintones', icon: '💜', price: 200000, desc: '+20% Click & +15% Dust', color: '#a855f7', effect: { clickMult: 0.20, dustMult: 0.15 } }
 ];
 
-// ----------------------------------------------------
-// 2. STAT BONUSES CALCULATION ENGINE
-// ----------------------------------------------------
+// --- STAT CALCULATION ENGINE ---
 function getCosmeticBonuses() {
   const totals = { clickMult: 0, cpsMult: 0, dustMult: 0 };
-  if (!state.equippedCosmetics) return totals;
-
   Object.values(state.equippedCosmetics).forEach(itemId => {
     const item = COSMETICS_DATA.find(c => c.id === itemId);
     if (item && item.effect) {
@@ -40,59 +154,112 @@ function getCosmeticBonuses() {
       if (item.effect.dustMult) totals.dustMult += item.effect.dustMult;
     }
   });
-
   return totals;
 }
 
-// ----------------------------------------------------
-// 3. WARDROBE RENDER & LOGIC
-// ----------------------------------------------------
-function renderWardrobe() {
-  if (!state.activeCosmCategory) state.activeCosmCategory = 'hats';
-  
-  // Update current stars display
-  const starCountEl = document.getElementById('shop-star-count');
-  if (starCountEl) starCountEl.textContent = fmt(state.count);
+function getClickPower() {
+  const cosmetics = getCosmeticBonuses();
+  const dustBonus = 1 + (state.dust * 0.10); // +10% per Dust
+  return state.baseClickPower * (1 + cosmetics.clickMult) * dustBonus;
+}
 
-  // Render Category Tabs
+function getCPS() {
+  const cosmetics = getCosmeticBonuses();
+  const dustBonus = 1 + (state.dust * 0.10);
+  return state.baseCPS * (1 + cosmetics.cpsMult) * dustBonus;
+}
+
+function getPendingDust() {
+  if (state.totalEarned < 100000) return 0;
+  const cosmetics = getCosmeticBonuses();
+  const baseDust = Math.floor(Math.pow(state.totalEarned / 100000, 0.4));
+  return Math.floor(baseDust * (1 + cosmetics.dustMult));
+}
+
+// --- GAMEPLAY ACTIONS ---
+function clickStar(e) {
+  const power = getClickPower();
+  state.count += power;
+  state.totalEarned += power;
+
+  // Floating indicator
+  const el = document.createElement('div');
+  el.className = 'click-text';
+  el.textContent = '+' + fmt(power);
+  el.style.left = (e.clientX - 15) + 'px';
+  el.style.top = (e.clientY - 20) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+
+  updateUI();
+}
+
+function buyUpgrade(key) {
+  const up = state.upgrades[key];
+  if (state.count >= up.cost) {
+    state.count -= up.cost;
+    up.count++;
+    if (up.clickPower) state.baseClickPower += up.clickPower;
+    if (up.cps) state.baseCPS += up.cps;
+    up.cost = Math.floor(up.cost * 1.15);
+    updateUI();
+  }
+}
+
+function ascend() {
+  const pending = getPendingDust();
+  if (pending <= 0) {
+    alert("You need at least 100,000 total earned stars to perform a Celestial Ascension!");
+    return;
+  }
+  
+  state.dust += pending;
+  state.count = 0;
+  state.baseClickPower = 1;
+  state.baseCPS = 0;
+  state.upgrades.cursor = { count: 0, cost: 15, cps: 1 };
+  state.upgrades.booster = { count: 0, cost: 100, clickPower: 2 };
+  state.upgrades.starfield = { count: 0, cost: 1100, cps: 8 };
+
+  updateUI();
+  switchTab('game');
+  alert(`Ascended! You received +${pending} Celestial Dust.`);
+}
+
+// --- WARDROBE RENDER & LOGIC ---
+function renderWardrobe() {
   const catTabs = document.getElementById('cosm-cat-tabs');
   const categories = ['hats', 'skins', 'auras', 'skintones'];
-  if (catTabs) {
-    catTabs.innerHTML = '';
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.className = 'cosm-tab' + (state.activeCosmCategory === cat ? ' active' : '');
-      btn.textContent = cat.toUpperCase();
-      btn.onclick = () => {
-        state.activeCosmCategory = cat;
-        renderWardrobe();
-      };
-      catTabs.appendChild(btn);
-    });
-  }
+  
+  catTabs.innerHTML = '';
+  categories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cosm-tab' + (state.activeCosmCategory === cat ? ' active' : '');
+    btn.textContent = cat.toUpperCase();
+    btn.onclick = () => {
+      state.activeCosmCategory = cat;
+      renderWardrobe();
+    };
+    catTabs.appendChild(btn);
+  });
 
-  // Render Grid Items
   const grid = document.getElementById('cosm-grid');
-  if (!grid) return;
   grid.innerHTML = '';
 
   const filtered = COSMETICS_DATA.filter(item => item.cat === state.activeCosmCategory);
-
   filtered.forEach(item => {
-    const isOwned = (state.ownedCosmetics || []).includes(item.id);
-    const isEquipped = state.equippedCosmetics && state.equippedCosmetics[item.cat] === item.id;
+    const isOwned = state.ownedCosmetics.includes(item.id);
+    const isEquipped = state.equippedCosmetics[item.cat] === item.id;
 
     const card = document.createElement('div');
     card.className = 'cosm-item' + (isEquipped ? ' equipped' : '');
-    
-    // Style adjustments for custom skin tones
     const iconStyle = item.color ? `style="text-shadow: 0 0 10px ${item.color}; color: ${item.color}"` : '';
 
     card.innerHTML = `
       <span class="cosm-icon" ${iconStyle}>${item.icon}</span>
-      <div class="cosm-name">${item.name}</div>
-      <div class="cosm-desc" style="font-size:0.75rem; color:#aaa; margin: 4px 0;">${item.desc}</div>
-      <div class="cosm-price" style="color:${isEquipped ? '#4ade80' : isOwned ? '#60a5fa' : 'var(--gold)'}">
+      <strong style="font-size:0.85rem">${item.name}</strong>
+      <div style="font-size:0.7rem; color:var(--text-muted)">${item.desc}</div>
+      <div style="font-size:0.8rem; font-weight:bold; color:${isEquipped ? '#4ade80' : isOwned ? '#60a5fa' : 'var(--gold)'}">
         ${isEquipped ? 'EQUIPPED' : isOwned ? 'EQUIP' : '⭐ ' + fmt(item.price)}
       </div>
     `;
@@ -102,62 +269,98 @@ function renderWardrobe() {
 }
 
 function handleCosmeticClick(item) {
-  if (!state.ownedCosmetics) state.ownedCosmetics = [];
-  if (!state.equippedCosmetics) state.equippedCosmetics = {};
-
   const isOwned = state.ownedCosmetics.includes(item.id);
 
   if (isOwned) {
-    // Equip or Unequip
     if (state.equippedCosmetics[item.cat] === item.id) {
       delete state.equippedCosmetics[item.cat];
     } else {
       state.equippedCosmetics[item.cat] = item.id;
     }
-  } else {
-    // Purchase item
-    if (state.count >= item.price) {
-      state.count -= item.price;
-      state.ownedCosmetics.push(item.id);
-      state.equippedCosmetics[item.cat] = item.id;
-      if (typeof SFX !== 'undefined' && SFX.playGolden) SFX.playGolden();
-    }
+  } else if (state.count >= item.price) {
+    state.count -= item.price;
+    state.ownedCosmetics.push(item.id);
+    state.equippedCosmetics[item.cat] = item.id;
   }
 
   applyCosmeticVisuals();
-  if (typeof updateStats === 'function') updateStats();
   renderWardrobe();
-  if (typeof saveUser === 'function') saveUser();
+  updateUI();
 }
 
-// Applies visual custom skin tone / aura styles directly to the player star element
 function applyCosmeticVisuals() {
-  const mainStar = document.getElementById('main-star');
-  if (!mainStar) return;
-
-  const equipped = state.equippedCosmetics || {};
-  const toneItem = COSMETICS_DATA.find(c => c.id === equipped['skintones']);
+  const star = document.getElementById('main-star');
+  const toneId = state.equippedCosmetics['skintones'];
+  const toneItem = COSMETICS_DATA.find(c => c.id === toneId);
 
   if (toneItem && toneItem.color) {
-    mainStar.style.filter = `drop-shadow(0 0 15px ${toneItem.color})`;
+    star.style.filter = `drop-shadow(0 0 20px ${toneItem.color})`;
   } else {
-    mainStar.style.filter = '';
+    star.style.filter = 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.3))';
   }
 }
 
-// ----------------------------------------------------
-// 4. TAB & GAME ENGINE HOOKS
-// ----------------------------------------------------
+// --- UI & CORE LOOP ---
 function switchTab(t) {
-  ['game','spin','cosm','profile','prestige'].forEach(id => {
-    const btn = document.getElementById('tab-' + id);
-    const panel = document.getElementById('panel-' + id);
-    if(btn && panel) {
-      btn.classList.toggle('active', id === t);
-      panel.classList.toggle('active', id === t);
-    }
+  ['game','cosm','prestige'].forEach(id => {
+    document.getElementById('tab-' + id).classList.toggle('active', id === t);
+    document.getElementById('panel-' + id).classList.toggle('active', id === t);
   });
-  if(t === 'prestige' && typeof renderPerks === 'function') renderPerks();
-  if(t === 'spin' && typeof renderSpinTab === 'function') renderSpinTab();
-  if(t === 'cosm') renderWardrobe();
+  if (t === 'cosm') renderWardrobe();
 }
+
+function renderUpgrades() {
+  const container = document.getElementById('upgrade-list');
+  container.innerHTML = '';
+  
+  const items = [
+    { key: 'cursor', name: 'Auto-Cursor', desc: '+1 CPS' },
+    { key: 'booster', name: 'Click Power Boost', desc: '+2 Click Power' },
+    { key: 'starfield', name: 'Star Generator', desc: '+8 CPS' }
+  ];
+
+  items.forEach(item => {
+    const up = state.upgrades[item.key];
+    const card = document.createElement('div');
+    card.className = 'upgrade-card';
+    card.innerHTML = `
+      <div>
+        <div><strong>${item.name}</strong> (${up.count})</div>
+        <div style="font-size:0.75rem; color: var(--text-muted);">${item.desc}</div>
+      </div>
+      <button style="padding:6px 12px; background:var(--accent); border:none; color:white; border-radius:6px; cursor:pointer;" onclick="buyUpgrade('${item.key}')">
+        ⭐ ${fmt(up.cost)}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function updateUI() {
+  document.getElementById('star-count').textContent = fmt(state.count);
+  document.getElementById('dust-count').textContent = fmt(state.dust);
+  document.getElementById('click-power').textContent = fmt(getClickPower());
+  document.getElementById('cps-val').textContent = fmt(getCPS());
+  document.getElementById('pending-dust').textContent = fmt(getPendingDust());
+  renderUpgrades();
+}
+
+function fmt(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return Math.floor(n).toLocaleString();
+}
+
+// Game loop (10 FPS tick)
+setInterval(() => {
+  const gained = getCPS() / 10;
+  state.count += gained;
+  state.totalEarned += gained;
+  document.getElementById('star-count').textContent = fmt(state.count);
+}, 100);
+
+// Init
+updateUI();
+</script>
+</body>
+</html>
